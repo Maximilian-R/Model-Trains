@@ -1,0 +1,5 @@
+# Ignore artifacts:
+dist/
+libraries/
+node_modules/
+.vscode/

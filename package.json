@@ -1,0 +1,29 @@
+{
+    "name": "model-trains",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "private": true,
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "watch": "webpack --watch",
+        "start": "webpack serve --open",
+        "build": "webpack"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Maximilian-R/Model-Trains.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Maximilian-R/Model-Trains/issues"
+    },
+    "homepage": "https://github.com/Maximilian-R/Model-Trains#readme",
+    "devDependencies": {
+        "prettier": "2.2.1",
+        "webpack": "^5.25.0",
+        "webpack-cli": "^4.5.0",
+        "webpack-dev-server": "^3.11.2"
+    }
+}
