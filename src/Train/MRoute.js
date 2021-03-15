@@ -59,8 +59,10 @@ export class MRoute {
     }
 
     // Refactor?
-    ConnectNodes(fromNode, toNode) {
-        var rail = this.CreateRail(fromNode, toNode);
+    ConnectNodes(fromNode, toNode, rail) {
+        if (!rail) {
+            rail = this.CreateRail(fromNode, toNode);
+        }
 
         toNode.SetEmptyRail(rail);
         fromNode.SetEmptyRail(rail);

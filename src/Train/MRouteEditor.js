@@ -286,7 +286,8 @@ class BuildState extends MEditorState {
             // One function should CREATE a rail dependent on direction etc...
             // One function should BUILD (adding it to the route)
             this.editor.route.AddNode(this.created.endNode);
-            this.editor.route.ConnectNodes(this.buildFromNode, this.created.endNode);
+            this.editor.route.AddRail(this.created.rail);
+            this.editor.route.ConnectNodes(this.buildFromNode, this.created.endNode, this.created.rail);
 
             this.nextState = new BuildState(this.editor, this.created.endNode);
         }
