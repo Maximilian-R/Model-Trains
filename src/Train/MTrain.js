@@ -31,9 +31,15 @@ export class MTrain {
         this.wagons = [];
         //start a bit in on the rail
         let offset = 50;
-        for (var i = 0; i < 2; i++) {
+        const wagons = 6;
+        for (var i = 0; i <= wagons; i++) {
             this.wagons.push(
-                new MTrainWagon(this, offset + TRAIN_WAGON_WHEEL_INSET, offset + TRAIN_WAGON_LENGTH - TRAIN_WAGON_WHEEL_INSET),
+                new MTrainWagon(
+                    this,
+                    offset + TRAIN_WAGON_WHEEL_INSET,
+                    offset + TRAIN_WAGON_LENGTH - TRAIN_WAGON_WHEEL_INSET,
+                    i === wagons ? sketch.MSprites[1] : sketch.MSprites[0],
+                ),
             );
             offset += TRAIN_WAGON_LENGTH + TRAIN_WAGON_GAP;
         }
@@ -78,15 +84,15 @@ export class MTrain {
         }
     }
 }
-let TRAIN_INDEX = 0;
+
 export class MTrainWagon {
-    constructor(train, c1, c2) {
+    constructor(train, c1, c2, sprite) {
         this.train = train;
+        this.sprite = sprite;
 
         this.wheel1 = new MTrainWheelPair(this, c1, this.train.route);
         this.wheel2 = new MTrainWheelPair(this, c2, this.train.route);
         this.wheel2.front = true;
-        this.index = TRAIN_INDEX++;
     }
 
     Update(speed) {
@@ -116,7 +122,7 @@ export class MTrainWagon {
         //sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
 
         sketch.imageMode(sketch.CENTER);
-        sketch.image(sketch.MSprites[this.index], 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+        sketch.image(this.sprite, 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
         sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
         sketch.rotate(sketch.PI);
         sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
