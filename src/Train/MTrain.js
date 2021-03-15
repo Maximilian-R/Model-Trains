@@ -6,7 +6,7 @@ import { SCALE } from '../Game/MConstans';
 const TRAIN_WAGON_LENGTH = 120 * SCALE;
 const TRAIN_WAGON_WIDTH = 20 * SCALE;
 const TRAIN_WAGON_WHEEL_INSET = 10 * SCALE;
-const TRAIN_WAGON_GAP = 10 * SCALE;
+const TRAIN_WAGON_GAP = 8 * SCALE;
 
 export class MTrain {
     constructor(InputHandler, route) {
