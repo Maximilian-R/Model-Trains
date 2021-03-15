@@ -14,7 +14,16 @@ const sketch = (p) => {
         p.frameRate(60);
 
         GameMain = new MMain();
+        window.GameMain = GameMain;
         GameMain.Setup();
+    };
+
+    p.preload = () => {
+        p.MSprites = [];
+
+        p.MSprites.push(p.loadImage('Trains/Small/Carts/Cart_Short_Container_Blue.png'));
+        p.MSprites.push(p.loadImage('Trains/Small/Trains/Train_130x20_Blue.png'));
+        p.MSprites.push(p.loadImage('Trains/Small/Conectors&Extras/Conectror_5.png'));
     };
 
     p.draw = () => {

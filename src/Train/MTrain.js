@@ -1,11 +1,12 @@
 import { KEY_MAP } from '../Game/MControls.js';
 import { MVector } from '../Utilities/MVector.js';
 import { MKeyEvent } from '../Utilities/MEvent.js';
+import { SCALE } from '../Game/MConstans';
 
-const TRAIN_WAGON_LENGTH = 120;
-const TRAIN_WAGON_WIDTH = 20;
-const TRAIN_WAGON_WHEEL_INSET = 10;
-const TRAIN_WAGON_GAP = 10;
+const TRAIN_WAGON_LENGTH = 120 * SCALE;
+const TRAIN_WAGON_WIDTH = 20 * SCALE;
+const TRAIN_WAGON_WHEEL_INSET = 10 * SCALE;
+const TRAIN_WAGON_GAP = 10 * SCALE;
 
 export class MTrain {
     constructor(InputHandler, route) {
@@ -77,7 +78,7 @@ export class MTrain {
         }
     }
 }
-
+let TRAIN_INDEX = 0;
 export class MTrainWagon {
     constructor(train, c1, c2) {
         this.train = train;
@@ -85,6 +86,7 @@ export class MTrainWagon {
         this.wheel1 = new MTrainWheelPair(this, c1, this.train.route);
         this.wheel2 = new MTrainWheelPair(this, c2, this.train.route);
         this.wheel2.front = true;
+        this.index = TRAIN_INDEX++;
     }
 
     Update(speed) {
@@ -108,9 +110,17 @@ export class MTrainWagon {
         sketch.push();
         sketch.translate(mid.x, mid.y);
         sketch.rotate(inverseTan);
-        sketch.fill(255);
-        sketch.rectMode(sketch.CENTER);
-        sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+
+        //sketch.fill(255);
+        //sketch.rectMode(sketch.CENTER);
+        //sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+
+        sketch.imageMode(sketch.CENTER);
+        sketch.image(sketch.MSprites[this.index], 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.rotate(sketch.PI);
+        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+
         sketch.pop();
 
         this.wheel1.Draw();
@@ -160,9 +170,11 @@ export class MTrainWheelPair {
     }
 
     Draw() {
-        sketch.push();
-        this.front ? sketch.fill(150, 255, 150) : sketch.fill(255, 150, 150);
-        sketch.ellipse(this.position.x, this.position.y, 10);
-        sketch.pop();
+        if (DEBUG_MODE) {
+            sketch.push();
+            this.front ? sketch.fill(150, 255, 150) : sketch.fill(255, 150, 150);
+            sketch.ellipse(this.position.x, this.position.y, 10);
+            sketch.pop();
+        }
     }
 }

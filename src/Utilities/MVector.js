@@ -8,6 +8,11 @@ export class MVector {
         return false;
     }
 
+    static AlmostEquals(p1, p2, slack) {
+        if (p1.x >= p2.x - slack && p1.x <= p2.x + slack && p1.y >= p2.y - slack && p1.y <= p2.y + slack) return true;
+        return false;
+    }
+
     static FromPolar(radius, angle) {
         return this.Create(radius * cos(angle), radius * sin(angle));
     }

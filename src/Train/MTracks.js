@@ -1,9 +1,11 @@
 import { MVector } from '../Utilities/MVector.js';
 import { MLine, MArc } from '../Utilities/MMath.js';
 import { MDraw } from '../Utilities/MDraw.js';
+import { SCALE } from '../Game/MConstans';
 
-const RAIL_WIDTH = 10;
-const RAIL_STROKE_WIDTH = 2;
+const RAIL_WIDTH = 12 * SCALE;
+const RAIL_STROKE_WIDTH = 2 * SCALE;
+const RAIL_MIDDLE_STROKE_WEIGHT = 6 * SCALE;
 const RAIL_STROKE_COLOR = '#63615f';
 const RAIL_STROKE_COLOR_LIT = '#42f4ee';
 const CENTER_RAIL_STROKE_COLOR = '#7c674e';
@@ -80,7 +82,7 @@ export class MRailLineEdge extends MRailEdge {
         sketch.line(from.x + offset * d.y, from.y - offset * d.x, to.x + offset * d.y, to.y - offset * d.x);
 
         /* ONE RAIL: The one that trains will follow */
-        sketch.strokeWeight(offset);
+        sketch.strokeWeight(RAIL_MIDDLE_STROKE_WEIGHT);
         sketch.stroke(CENTER_RAIL_STROKE_COLOR);
         MDraw.Line(from, to);
 
@@ -119,7 +121,8 @@ export class MRailLineEdge extends MRailEdge {
     static IsStraight(from, to) {
         const target1 = MVector.Add(from.position, MVector.Mult(from.direction, MVector.Dist(from.position, to)));
         const target2 = MVector.Add(from.position, MVector.Mult(MVector.Invert(from.direction), MVector.Dist(from.position, to)));
-        return MVector.Equals(target1, to) || MVector.Equals(target2, to);
+        // Ignore small differences, positions should be limited to int.
+        return MVector.AlmostEquals(target1, to, 0.5) || MVector.AlmostEquals(target2, to, 0.5);
     }
 
     Validate() {
