@@ -87,7 +87,7 @@ export class MRouteEditor {
 
     Update() {
         if (this.nextState) {
-            if (this.state) this.state.OnExit();
+            this.state?.OnExit();
             this.state = this.nextState;
             this.state.OnEnter();
             this.nextState = undefined;
@@ -179,12 +179,17 @@ class AddState extends MEditorState {
 
         this.hoverNodeEnd;
         this.hoverRail;
+        this.railEnds;
+    }
+
+    OnEnter() {
+        this.railEnds = this.editor.route.railEnds;
     }
 
     Draw() {
         sketch.noFill();
         sketch.strokeWeight(3);
-        this.editor.route.railEnds.forEach((node) => {
+        this.railEnds.forEach((node) => {
             node === this.hoverNodeEnd ? sketch.stroke(0, 80, 255, 255) : sketch.stroke(0, 200, 255, 200);
             MDraw.DrawTriangle(node.position, node.direction);
         });
@@ -194,6 +199,7 @@ class AddState extends MEditorState {
         if (!this.hoverNodeEnd) {
             this.editor.points[0] = window.Handles.FreeMoveHandle(0, this.editor.points[0], 15);
         }
+
         return super.Update();
     }
 
@@ -206,11 +212,12 @@ class AddState extends MEditorState {
                 this.nextState = new BuildState(this.editor, switchNode);
             } else {
                 const fromNode = this.editor.route.CreateNode(this.editor.points[0], MVector.Create(1, 0));
-                this.nextState = new BuildState(this.editor, fromNode);
+                this.nextState = new RotateNodeState(this.editor, fromNode);
             }
         }
 
         if (event.event === 'MOUSE_MOVE') {
+            this.hoverNodeEnd = undefined;
             this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
             if (this.hoverRail) {
                 this.editor.points[0] = this.hoverRail.ClosestPositionOnTrack(this.editor.points[0], this.hoverRail);
@@ -426,6 +433,41 @@ class ConnectState extends MEditorState {
 
         if (event.event == 'KEY_PRESS' && event.key == KEY_MAP.ESC) {
             this.nextState = new BuildState(this.editor, this.buildFromNode);
+        }
+    }
+}
+
+class RotateNodeState extends MEditorState {
+    constructor(editor, node) {
+        window.DEBUG_MODE && console.log('Enter Rotate Node State');
+        super(editor);
+
+        this.node = node;
+    }
+
+    Update() {
+        this.editor.points[0] = window.Handles.FreeMoveHandle(0, this.editor.points[0], 15);
+        return super.Update();
+    }
+
+    Draw() {}
+
+    OnUserInput(event) {
+        if (event.event == 'MOUSE_DOWN' && event.button == 'left') {
+            this.nextState = new BuildState(this.editor, this.node);
+        }
+
+        if (event.event == 'MOUSE_MOVE') {
+            this.node.direction = MVector.Sub(this.editor.points[0], this.node.position);
+        }
+
+        if (event instanceof MKeyEvent) {
+            switch (event.key) {
+                case KEY_MAP.ESC:
+                    this.editor.route.DeleteNode(this.node);
+                    this.nextState = new AddState(this.editor);
+                    break;
+            }
         }
     }
 }
