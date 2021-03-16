@@ -191,7 +191,7 @@ class AddState extends MEditorState {
     }
 
     Update() {
-        if (this.hoverRail) {
+        if (!this.hoverNodeEnd) {
             this.editor.points[0] = window.Handles.FreeMoveHandle(0, this.editor.points[0], 15);
         }
         return super.Update();
@@ -205,7 +205,8 @@ class AddState extends MEditorState {
                 const switchNode = this.editor.route.CreateSwitch(this.hoverRail, this.editor.points[0]);
                 this.nextState = new BuildState(this.editor, switchNode);
             } else {
-                // start building from position, new node.
+                const fromNode = this.editor.route.CreateNode(this.editor.points[0], MVector.Create(1, 0));
+                this.nextState = new BuildState(this.editor, fromNode);
             }
         }
 
@@ -213,8 +214,9 @@ class AddState extends MEditorState {
             this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
             if (this.hoverRail) {
                 this.editor.points[0] = this.hoverRail.ClosestPositionOnTrack(this.editor.points[0], this.hoverRail);
+            } else {
+                this.hoverNodeEnd = this.editor.route.GetNodeEndAt(this.editor.points[0]);
             }
-            this.hoverNodeEnd = this.editor.route.GetNodeEndAt(this.editor.points[0]);
         }
 
         if (event instanceof MKeyEvent) {
@@ -242,7 +244,7 @@ class BuildState extends MEditorState {
 
     OnEnter() {
         const rail = this.buildFromNode.GetAnyRail();
-        const oppsite = rail.OppositeNode(this.buildFromNode);
+        const oppsite = rail?.OppositeNode(this.buildFromNode);
         this.availableNodeEnds = this.editor.route.railEnds.filter((node) => node !== oppsite && node !== this.buildFromNode);
     }
 

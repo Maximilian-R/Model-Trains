@@ -56,6 +56,7 @@ export class MNode {
         } else if (this.rail2) {
             return this.rail2;
         } else {
+            return undefined;
             console.error('Node has no rail');
         }
     }
