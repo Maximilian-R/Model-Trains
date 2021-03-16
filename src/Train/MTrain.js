@@ -8,19 +8,18 @@ const TRAIN_WAGON_WIDTH = 20 * SCALE;
 const TRAIN_WAGON_WHEEL_INSET = 10 * SCALE;
 const TRAIN_WAGON_GAP = 8 * SCALE;
 
+const TRAIN_FRICTION = 0.02;
+const TRAIN_MAX_SPEED = 10.0;
+const TRAIN_ACCELERATION_FACTOR = 0.04;
+
 export class MTrain {
     constructor(InputHandler, route) {
         this.route = route;
         this.wagons = [];
 
         this.speed = 0.0;
-        this.maxSpeed = 10.0;
-        this.targetSpeed = 5.0;
         this.acc = 0.0;
-        this.maxAcc = 0.04;
-        //this.breaking = 0.0;
-        this.power = 0.6;
-        this.friction = 0.02;
+        this.power = 0.0;
 
         InputHandler.RegisterObserver(this, this.OnEventNotify);
 
@@ -29,8 +28,7 @@ export class MTrain {
 
     Reset() {
         this.wagons = [];
-        //start a bit in on the rail
-        let offset = 50;
+        let offset = 0;
         const wagons = 6;
         for (var i = 0; i <= wagons; i++) {
             this.wagons.push(
@@ -55,13 +53,11 @@ export class MTrain {
 
     Update() {
         this.power = sketch.keyIsDown(KEY_MAP.SPACE) ? 1.0 : 0.0;
-
-        this.acc = this.power * this.maxAcc;
-
-        this.speed -= this.friction;
-
-        if (this.speed < this.targetSpeed && this.speed < this.maxSpeed) {
-            this.speed += this.acc;
+        this.acc = this.power * TRAIN_ACCELERATION_FACTOR;
+        this.speed -= TRAIN_FRICTION;
+        this.speed += this.acc;
+        if (this.speed >= TRAIN_MAX_SPEED) {
+            this.speed = TRAIN_MAX_SPEED;
         }
         if (this.speed < 0) {
             this.speed = 0;
@@ -90,8 +86,8 @@ export class MTrainWagon {
         this.train = train;
         this.sprite = sprite;
 
-        this.wheel1 = new MTrainWheelPair(this, c1, this.train.route);
-        this.wheel2 = new MTrainWheelPair(this, c2, this.train.route);
+        this.wheel1 = new MTrainWheelPair(this, c1, this.train.route[0]);
+        this.wheel2 = new MTrainWheelPair(this, c2, this.train.route[0]);
         this.wheel2.front = true;
     }
 
@@ -117,15 +113,9 @@ export class MTrainWagon {
         sketch.translate(mid.x, mid.y);
         sketch.rotate(inverseTan);
 
-        //sketch.fill(255);
-        //sketch.rectMode(sketch.CENTER);
-        //sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
-
-        sketch.imageMode(sketch.CENTER);
-        sketch.image(this.sprite, 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
-        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
-        sketch.rotate(sketch.PI);
-        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.fill(255);
+        sketch.rectMode(sketch.CENTER);
+        sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
 
         sketch.pop();
 
@@ -135,13 +125,13 @@ export class MTrainWagon {
 }
 
 export class MTrainWheelPair {
-    constructor(wagon, current, route) {
+    constructor(wagon, current, onRail) {
         this.wagon = wagon;
         this.current = current;
         this.position;
-        this.from = route[0].node1;
-        this.to = route[0].node2;
-        this.onRail = route[0];
+        this.onRail = onRail;
+        this.from = this.onRail.node1;
+        this.to = this.onRail.node2;
         this.front = false;
     }
 
