@@ -251,7 +251,7 @@ class BuildState extends MEditorState {
 
     OnEnter() {
         const rail = this.buildFromNode.GetAnyRail();
-        const oppsite = rail?.OppositeNode(this.buildFromNode);
+        const oppsite = rail instanceof MRailLineEdge && rail.OppositeNode(this.buildFromNode);
         this.availableNodeEnds = this.editor.route.railEnds.filter((node) => node !== oppsite && node !== this.buildFromNode);
     }
 
@@ -306,9 +306,11 @@ class BuildState extends MEditorState {
 
             // TODO: Create function in som vector class?
             if (this.forceStraight) {
-                const distance = this.editor.points[0].dist(this.buildFromNode.position);
-                const forceEnd = MVector.Add(this.buildFromNode.position, MVector.Mult(this.buildFromNode.direction, distance));
-                this.editor.points[0] = forceEnd;
+                this.editor.points[0] = MVector.ConstrainToLine(
+                    this.buildFromNode.position,
+                    this.buildFromNode.direction,
+                    this.editor.points[0],
+                );
             }
 
             this.availableNodeEnds.some((node) => {
@@ -327,6 +329,13 @@ class BuildState extends MEditorState {
 
         if (event.event == 'KEY_PRESS' && event.key == KEY_MAP.SHIFT) {
             this.forceStraight = !this.forceStraight;
+            if (this.forceStraight) {
+                this.editor.points[0] = MVector.ConstrainToLine(
+                    this.buildFromNode.position,
+                    this.buildFromNode.direction,
+                    this.editor.points[0],
+                );
+            }
         }
 
         if (event.event == 'KEY_PRESS' && event.key == KEY_MAP.I) {

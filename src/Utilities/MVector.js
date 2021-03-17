@@ -52,4 +52,9 @@ export class MVector {
     static Dist(p1, p2) {
         return sketch.dist(p1.x, p1.y, p2.x, p2.y);
     }
+
+    static ConstrainToLine(position, direction, target) {
+        const distance = target.dist(position);
+        return MVector.Add(position, MVector.Mult(direction, distance));
+    }
 }
