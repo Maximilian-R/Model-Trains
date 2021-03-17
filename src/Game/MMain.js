@@ -85,7 +85,7 @@ export class MMain {
         this.GameCameraController = new MCameraController(this.InputHandler, this.GameCamera);
 
         this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, route);
-        this.Train = new MTrain(this.InputHandler, this.TrackEditor.route.rails);
+        this.Train = new MTrain(this.InputHandler, this.GameCamera, this.TrackEditor.route.rails);
     }
 
     Tick() {
