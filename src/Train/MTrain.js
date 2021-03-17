@@ -113,9 +113,15 @@ export class MTrainWagon {
         sketch.translate(mid.x, mid.y);
         sketch.rotate(inverseTan);
 
-        sketch.fill(255);
-        sketch.rectMode(sketch.CENTER);
-        sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+        //sketch.fill(255);
+        //sketch.rectMode(sketch.CENTER);
+        //sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+
+        sketch.imageMode(sketch.CENTER);
+        sketch.image(this.sprite, 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.rotate(sketch.PI);
+        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
 
         sketch.pop();
 
