@@ -70,22 +70,34 @@ window.DEBUG_MODE = true;
 export class MMain {
     constructor() {}
 
+    Scene1() {
+        const route = new MRoute();
+        const offsetX = 100;
+        const offsetY = sketch.height / 2;
+        const node1 = route.CreateNode(MVector.Create(offsetX + 0, offsetY + 0), MVector.Create(1, 0));
+        const node2 = route.CreateNode(MVector.Create(offsetX + 1000, offsetY + 0), MVector.Create(1, 0));
+        const node3 = route.CreateNode(MVector.Create(offsetX + 1000, offsetY + 400), MVector.Create(-1, 0));
+        const node4 = route.CreateNode(MVector.Create(offsetX + 0, offsetY + 400), MVector.Create(-1, 0));
+
+        route.ConnectNodes(node1, node2);
+        route.ConnectNodes(node2, node3);
+        route.ConnectNodes(node3, node4);
+        route.ConnectNodes(node4, node1);
+
+        return route;
+    }
+
     Setup() {
         this.InputHandler = new MInput();
         this.Handles = new MHandles(this.InputHandler);
         window.Handles = this.Handles;
 
-        // Only for testing - one create rail at init
-        const route = new MRoute();
-        const node1 = route.CreateNode(MVector.Create(100, 200), MVector.Create(1, 0));
-        const node2 = route.CreateNode(MVector.Create(1200, 200), MVector.Create(1, 0));
-        route.ConnectNodes(node1, node2);
-
         this.GameCamera = new MCamera();
         this.GameCameraController = new MCameraController(this.InputHandler, this.GameCamera);
 
+        const route = this.Scene1();
         this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, route);
-        this.Train = new MTrain(this.InputHandler, this.GameCamera, this.TrackEditor.route.rails);
+        this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
     }
 
     Tick() {
