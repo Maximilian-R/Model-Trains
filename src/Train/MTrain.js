@@ -13,7 +13,7 @@ const TRAIN_MAX_SPEED = 10.0;
 const TRAIN_ACCELERATION_FACTOR = 0.04;
 
 export class MTrain {
-    constructor(InputHandler, route) {
+    constructor(InputHandler, GameCamera, route) {
         this.route = route;
         this.wagons = [];
 
@@ -21,6 +21,7 @@ export class MTrain {
         this.acc = 0.0;
         this.power = 0.0;
 
+        this.GameCamera = GameCamera;
         InputHandler.RegisterObserver(this, this.OnEventNotify);
 
         this.Reset();
@@ -51,8 +52,16 @@ export class MTrain {
         }
     }
 
+    Follow() {
+        const loco = this.wagons[this.wagons.length - 1];
+        if (loco.wheel2.position) {
+            this.GameCamera.Teleport(MVector.Sub(loco.wheel2.position, MVector.Create(sketch.width / 2, sketch.height / 2)));
+        }
+    }
+
     Update() {
         this.power = sketch.keyIsDown(KEY_MAP.SPACE) ? 1.0 : 0.0;
+        if (this.power) this.Follow();
         this.acc = this.power * TRAIN_ACCELERATION_FACTOR;
         this.speed -= TRAIN_FRICTION;
         this.speed += this.acc;
