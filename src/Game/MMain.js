@@ -53,7 +53,7 @@ import { MRouteEditor } from '../Train/MRouteEditor.js';
 import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
 
-window.DEBUG_MODE = true;
+window.DEBUG_MODE = false;
 
 // function setup() {
 //     createCanvas(window.innerWidth, window.innerHeight);
@@ -72,7 +72,7 @@ export class MMain {
 
     Scene1() {
         const route = new MRoute();
-        const offsetX = 100;
+        const offsetX = 0;
         const offsetY = sketch.height / 2;
         const node1 = route.CreateNode(MVector.Create(offsetX + 0, offsetY + 0), MVector.Create(1, 0));
         const node2 = route.CreateNode(MVector.Create(offsetX + 1000, offsetY + 0), MVector.Create(1, 0));

@@ -75,7 +75,7 @@ export class MRouteEditor {
         this.points = [MVector.Create(), MVector.Create(), MVector.Create()];
         this.route = route;
         this.state;
-        this.nextState = new AddState(this);
+        this.nextState = new EditState(this);
 
         InputHandler.RegisterObserver(this, this.OnEventNotify);
     }

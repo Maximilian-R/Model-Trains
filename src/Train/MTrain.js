@@ -2,9 +2,11 @@ import { KEY_MAP } from '../Game/MControls.js';
 import { MVector } from '../Utilities/MVector.js';
 import { MKeyEvent } from '../Utilities/MEvent.js';
 import { SCALE } from '../Game/MConstans';
+import { MDraw } from '../Utilities/MDraw.js';
+import { MRailCurveEdge } from './MTracks.js';
 
-const TRAIN_WAGON_LENGTH = 120 * SCALE;
-const TRAIN_WAGON_WIDTH = 20 * SCALE;
+//const TRAIN_WAGON_LENGTH = 120 * SCALE;
+//const TRAIN_WAGON_WIDTH = 20 * SCALE;
 const TRAIN_WAGON_WHEEL_INSET = 10 * SCALE;
 const TRAIN_WAGON_GAP = 8 * SCALE;
 
@@ -29,18 +31,11 @@ export class MTrain {
 
     Reset() {
         this.wagons = [];
-        let offset = 0;
+        let offset = 100;
         const wagons = 6;
-        for (var i = 0; i <= wagons; i++) {
-            this.wagons.push(
-                new MTrainWagon(
-                    this,
-                    offset + TRAIN_WAGON_WHEEL_INSET,
-                    offset + TRAIN_WAGON_LENGTH - TRAIN_WAGON_WHEEL_INSET,
-                    i === wagons ? sketch.MSprites[1] : sketch.MSprites[0],
-                ),
-            );
-            offset += TRAIN_WAGON_LENGTH + TRAIN_WAGON_GAP;
+        for (var i = 0; i < wagons; i++) {
+            this.wagons.push(new MTrainWagon(this, offset, i === wagons - 1 ? sketch.MSprites[1] : sketch.MSprites[0]));
+            offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
         }
     }
 
@@ -91,13 +86,19 @@ export class MTrain {
 }
 
 export class MTrainWagon {
-    constructor(train, c1, c2, sprite) {
+    constructor(train, current, sprite) {
         this.train = train;
         this.sprite = sprite;
+        this.wheel1 = new MTrainWheelPair(this, current + this.length - TRAIN_WAGON_WHEEL_INSET, this.train.route[0], true);
+        this.wheel2 = new MTrainWheelPair(this, current + TRAIN_WAGON_WHEEL_INSET, this.train.route[0]);
+    }
 
-        this.wheel1 = new MTrainWheelPair(this, c1, this.train.route[0]);
-        this.wheel2 = new MTrainWheelPair(this, c2, this.train.route[0]);
-        this.wheel2.front = true;
+    get length() {
+        return this.sprite.width * SCALE;
+    }
+
+    get width() {
+        return this.sprite.height * SCALE;
     }
 
     Update(speed) {
@@ -124,30 +125,45 @@ export class MTrainWagon {
 
         //sketch.fill(255);
         //sketch.rectMode(sketch.CENTER);
-        //sketch.rect(0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
+        //sketch.rect(0, 0, this.length, this.width);
 
         sketch.imageMode(sketch.CENTER);
-        sketch.image(this.sprite, 0, 0, TRAIN_WAGON_LENGTH, TRAIN_WAGON_WIDTH);
-        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(this.sprite, 0, 0, this.length, this.width);
+        sketch.image(sketch.MSprites[2], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
         sketch.rotate(sketch.PI);
-        sketch.image(sketch.MSprites[2], TRAIN_WAGON_LENGTH / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(sketch.MSprites[2], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
 
         sketch.pop();
 
         this.wheel1.Draw();
         this.wheel2.Draw();
+
+        if (DEBUG_MODE) {
+            if (this.wheel1.position && this.wheel2.position) {
+                //sketch.stroke(50, 50, 255);
+                //sketch.strokeWeight(2);
+                //MDraw.Line(this.wheel1.position, this.wheel2.position);
+
+                sketch.push();
+                sketch.translate(mid.x, mid.y);
+                sketch.textSize(14);
+                sketch.noStroke();
+                sketch.text(MVector.Dist(this.wheel1.position, this.wheel2.position).toFixed(0), 0, 0);
+                sketch.pop();
+            }
+        }
     }
 }
 
 export class MTrainWheelPair {
-    constructor(wagon, current, onRail) {
+    constructor(wagon, current, onRail, front = false) {
         this.wagon = wagon;
         this.current = current;
         this.position;
         this.onRail = onRail;
         this.from = this.onRail.node1;
         this.to = this.onRail.node2;
-        this.front = false;
+        this.front = front;
     }
 
     ChangeDirection() {
@@ -158,7 +174,8 @@ export class MTrainWheelPair {
     }
 
     Update(speed) {
-        var dstToNextTrack = this.onRail.Distance();
+        // do this calc again when setting next rail=
+        const dstToNextTrack = this.onRail.Distance();
 
         this.current += speed;
         while (this.current >= dstToNextTrack) {
@@ -176,7 +193,7 @@ export class MTrainWheelPair {
             }
         }
 
-        var t = this.current / dstToNextTrack;
+        const t = this.current / dstToNextTrack;
         this.position = this.onRail.PointAlongRail(t, this.from.position, this.to.position);
     }
 
@@ -186,6 +203,15 @@ export class MTrainWheelPair {
             this.front ? sketch.fill(150, 255, 150) : sketch.fill(255, 150, 150);
             sketch.ellipse(this.position.x, this.position.y, 10);
             sketch.pop();
+
+            /* 
+            sketch.push();
+            sketch.translate(this.position.x, this.position.y);
+            sketch.textSize(14);
+            sketch.noStroke();
+            sketch.text(this.current.toFixed(0), 0, 0);
+            sketch.pop();
+            */
         }
     }
 }
