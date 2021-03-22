@@ -113,10 +113,18 @@ export class MRoute {
         this.UpdateRailEnds();
     }
 
-    DeleteRail(rail) {
+    DeleteRail(rail, deleteEmptyNodes = false) {
         this.rails.splice(this.rails.indexOf(rail), 1);
         rail.node1.RemoveRail(rail);
         rail.node2.RemoveRail(rail);
+        if (deleteEmptyNodes) {
+            if (rail.node1.GetAnyRail() === undefined) {
+                this.DeleteNode(rail.node1);
+            }
+            if (rail.node2.GetAnyRail() === undefined) {
+                this.DeleteNode(rail.node2);
+            }
+        }
         this.UpdateRailEnds();
     }
 

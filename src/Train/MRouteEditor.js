@@ -191,7 +191,7 @@ class ModifyState extends MEditorState {
         if (event instanceof MKeyEvent) {
             switch (event.key) {
                 case KEY_MAP.D:
-                    this.editor.route.DeleteRail(this.rail);
+                    this.editor.route.DeleteRail(this.rail, true);
                     this.nextState = new EditState(this.editor);
                     break;
             }
