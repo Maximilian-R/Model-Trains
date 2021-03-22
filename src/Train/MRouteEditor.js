@@ -151,6 +151,9 @@ class EditState extends MEditorState {
             if (this.hoverNode && this.hoverNode instanceof MSwitchNode) {
                 this.hoverNode.Switch();
             }
+            if (this.hoverRail) {
+                this.nextState = new ModifyState(this.editor, this.hoverRail);
+            }
         }
 
         if (event instanceof MKeyEvent) {
@@ -168,6 +171,30 @@ class EditState extends MEditorState {
         }
         if (this.hoverNode) {
             this.hoverNode.highlight = false;
+        }
+    }
+}
+
+class ModifyState extends MEditorState {
+    constructor(editor, rail) {
+        window.DEBUG_MODE && console.log('Enter Modify State');
+        super(editor);
+
+        this.rail = rail;
+    }
+
+    OnEnter() {
+        this.rail.highlight = true;
+    }
+
+    OnUserInput(event) {
+        if (event instanceof MKeyEvent) {
+            switch (event.key) {
+                case KEY_MAP.D:
+                    this.editor.route.DeleteRail(this.rail);
+                    this.nextState = new EditState(this.editor);
+                    break;
+            }
         }
     }
 }
@@ -459,7 +486,12 @@ class RotateNodeState extends MEditorState {
         return super.Update();
     }
 
-    Draw() {}
+    Draw() {
+        sketch.stroke(0, 200, 255, 200);
+        sketch.noFill();
+        sketch.strokeWeight(2);
+        MDraw.DrawTriangle(this.node.position, this.node.direction);
+    }
 
     OnUserInput(event) {
         if (event.event == 'MOUSE_DOWN' && event.button == 'left') {
