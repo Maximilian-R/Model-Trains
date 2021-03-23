@@ -52,8 +52,11 @@ import { MVector } from '../Utilities/MVector.js';
 import { MRouteEditor } from '../Train/MRouteEditor.js';
 import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
+import * as dat from 'dat.gui';
 
-window.DEBUG_MODE = false;
+window.DEBUG_MODE = true;
+const gui = new dat.GUI({ name: 'My GUI' });
+gui.add(window, 'DEBUG_MODE');
 
 // function setup() {
 //     createCanvas(window.innerWidth, window.innerHeight);
