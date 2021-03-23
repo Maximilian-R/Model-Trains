@@ -8,7 +8,7 @@ Todo
 -   [x] Remove tracks
 -   [] Editor GUI - Select edit mode
 -   [] Drag & Drop Train Carts
--   [] Add all images and copy to dist folder
+-   [x] Add all images and copy to dist folder
 -   [] Electric wires
 -   [] Console log all controls
 -   [] Camera zoom
