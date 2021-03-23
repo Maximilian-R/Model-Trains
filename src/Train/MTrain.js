@@ -4,6 +4,7 @@ import { MKeyEvent } from '../Utilities/MEvent.js';
 import { SCALE } from '../Game/MConstans';
 import { MDraw } from '../Utilities/MDraw.js';
 import { MRailCurveEdge } from './MTracks.js';
+import * as dat from 'dat.gui';
 
 //const TRAIN_WAGON_LENGTH = 120 * SCALE;
 //const TRAIN_WAGON_WIDTH = 20 * SCALE;
@@ -14,6 +15,25 @@ const TRAIN_FRICTION = 0.02;
 const TRAIN_MAX_SPEED = 10.0;
 const TRAIN_ACCELERATION_FACTOR = 0.04;
 
+class MTrainGUI {
+    constructor(train) {
+        this.train = train;
+        this.speedValue = 0;
+        this.setup();
+    }
+
+    update() {
+        this.speed.setValue(this.train.speed);
+    }
+
+    setup() {
+        const gui = new dat.GUI({ name: 'Train' });
+        this.power = gui.add(this.train, 'power', 0, 1.0, 0.1);
+        this.follow = gui.add(this.train, 'follow');
+        this.speed = gui.add(this, 'speedValue', 0, TRAIN_MAX_SPEED, 0.1);
+    }
+}
+
 export class MTrain {
     constructor(InputHandler, GameCamera, route) {
         this.route = route;
@@ -22,11 +42,13 @@ export class MTrain {
         this.speed = 0.0;
         this.acc = 0.0;
         this.power = 0.0;
+        this.follow = false;
 
         this.GameCamera = GameCamera;
         InputHandler.RegisterObserver(this, this.OnEventNotify);
 
         this.Reset();
+        this.gui = new MTrainGUI(this);
     }
 
     Reset() {
@@ -55,8 +77,6 @@ export class MTrain {
     }
 
     Update() {
-        this.power = sketch.keyIsDown(KEY_MAP.SPACE) ? 1.0 : 0.0;
-        if (this.power) this.Follow();
         this.acc = this.power * TRAIN_ACCELERATION_FACTOR;
         this.speed -= TRAIN_FRICTION;
         this.speed += this.acc;
@@ -70,6 +90,9 @@ export class MTrain {
         for (var i = 0; i < this.wagons.length; i++) {
             this.wagons[i].Update(this.speed);
         }
+
+        this.gui.update();
+        if (this.follow) this.Follow();
     }
 
     Draw() {
