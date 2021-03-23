@@ -5,7 +5,7 @@ Todo
 -   [] Node GUI - Position, Direction
 -   [x] Train GUI - Power, Follow, Speed display
 -   [] Load / Save Routes
--   [] Remove tracks
+-   [x] Remove tracks
 -   [] Editor GUI - Select edit mode
 -   [] Drag & Drop Train Carts
 -   [] Add all images and copy to dist folder
