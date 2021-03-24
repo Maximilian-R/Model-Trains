@@ -12,6 +12,7 @@ Todo
 -   [] Electric wires
 -   [] Console log all controls
 -   [] Camera zoom
--   []
+-   [] Train carts connection physics
+-   [] Multiple train sprites
 -   [] Bug : Rail direction inverted when splitting for a switch
 -   [] Bug : Carts sometimes 'glicth' when going to next node
