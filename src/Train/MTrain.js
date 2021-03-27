@@ -1,6 +1,6 @@
 import { KEY_MAP } from '../Game/MControls.js';
 import { MVector } from '../Utilities/MVector.js';
-import { MKeyEvent } from '../Utilities/MEvent.js';
+import { MKeyEvent } from '../Utilities/MInput.js';
 import * as dat from 'dat.gui';
 
 const TRAIN_WAGON_WHEEL_INSET = 10;

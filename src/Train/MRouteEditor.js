@@ -1,7 +1,7 @@
 import { MVector } from '../Utilities/MVector.js';
 import { MLine, MArc } from '../Utilities/MMath.js';
 import { MDraw } from '../Utilities/MDraw.js';
-import { MKeyEvent } from '../Utilities/MEvent.js';
+import { MKeyEvent } from '../Utilities/MInput.js';
 import { KEY_MAP } from '../Game/MControls.js';
 import { MRailLineEdge, MRailCurveEdge } from '../Train/MTracks.js';
 import { MSwitchNode } from '../Train/MNode.js';
@@ -70,14 +70,17 @@ BIARCS!
 
 export class MRouteEditor {
     // Editor
-    constructor(GameCamera, InputHandler, route) {
-        this.GameCamera = GameCamera;
+    constructor(camera, Input, cursor, route) {
+        this.camera = camera;
+        this.cursor = cursor;
         this.points = [MVector.Create(), MVector.Create(), MVector.Create()];
+        this.cursor = cursor;
         this.route = route;
         this.state;
         this.nextState = new EditState(this);
 
-        InputHandler.RegisterObserver(this, this.OnEventNotify);
+        this.cursor.RegisterObserver(this, this.OnEventNotify);
+        Input.RegisterObserver(this, this.OnEventNotify);
     }
 
     Draw() {
@@ -96,8 +99,8 @@ export class MRouteEditor {
     }
 
     OnEventNotify(event) {
-        if (event.event == 'MOUSE_MOVE' || event.event == 'MOUSE_SCROLL') {
-            this.points[0] = this.GameCamera.PositionInWorld(event.position);
+        if (event.event == 'CURSOR_MOVED') {
+            this.points[0] = event.position;
         }
         if (this.state) this.state.OnUserInput(event);
     }
@@ -129,7 +132,7 @@ class EditState extends MEditorState {
     }
 
     OnUserInput(event) {
-        if (event.event == 'MOUSE_MOVE') {
+        if (event.event == 'CURSOR_MOVED') {
             if (this.hoverNode) {
                 this.hoverNode.highlight = false;
             }
@@ -243,7 +246,7 @@ class AddState extends MEditorState {
             }
         }
 
-        if (event.event === 'MOUSE_MOVE') {
+        if (event.event === 'CURSOR_MOVED') {
             this.hoverNodeEnd = undefined;
             this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
             if (this.hoverRail) {
@@ -326,10 +329,10 @@ class BuildState extends MEditorState {
             this.editor.route.ConnectNodes(this.buildFromNode, this.created.endNode, this.created.rail);
 
             this.nextState = new BuildState(this.editor, this.created.endNode);
-            this.editor.GameCamera.Teleport(this.created.endNode.position);
+            this.editor.camera.Teleport(this.created.endNode.position);
         }
 
-        if (event.event == 'MOUSE_MOVE') {
+        if (event.event == 'CURSOR_MOVED') {
             //Detect hover on nodeEnd
 
             // TODO: Create function in som vector class?
@@ -464,7 +467,7 @@ class ConnectState extends MEditorState {
             this.nextState = new AddState(this.editor);
         }
 
-        if (event.event == 'MOUSE_MOVE') {
+        if (event.event == 'CURSOR_MOVED') {
             this.editor.points[2] = this.editor.points[0];
         }
 
@@ -499,7 +502,7 @@ class RotateNodeState extends MEditorState {
             this.nextState = new BuildState(this.editor, this.node);
         }
 
-        if (event.event == 'MOUSE_MOVE') {
+        if (event.event == 'CURSOR_MOVED') {
             this.node.direction = MVector.Sub(this.editor.points[0], this.node.position);
         }
 

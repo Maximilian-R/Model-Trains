@@ -14,5 +14,7 @@ Todo
 -   [x] Camera zoom
 -   [] Train carts connection physics
 -   [x] Multiple train sprites
+-   [x] Bug : Filter out mouse triggers when clicking in GUI
 -   [] Bug : Rail direction inverted when splitting for a switch
 -   [] Bug : Carts sometimes 'glicth' when going to next node
+-   [] Bug : Remove Train while building

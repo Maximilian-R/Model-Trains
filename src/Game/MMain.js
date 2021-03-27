@@ -45,7 +45,8 @@
 
 // https://gamedev.stackexchange.com/questions/139595/train-like-movement-in-a-2d-game
 
-import { MInput } from '../Utilities/MEvent.js';
+import { MInput } from '../Utilities/MInput.js';
+import { MCursor } from '../Utilities/MCursor.js';
 import { MHandles } from '../Utilities/MHandles.js';
 import { MRoute } from '../Train/MRoute.js';
 import { MVector } from '../Utilities/MVector.js';
@@ -97,14 +98,16 @@ export class MMain {
 
         this.GameCamera = new MCamera();
         this.GameCameraController = new MCameraController(this.InputHandler, this.GameCamera);
+        this.Cursor = new MCursor(this.GameCamera);
 
         const route = this.Scene1();
-        this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, route);
+        this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, this.Cursor, route);
         this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
     }
 
     Tick() {
         this.GameCameraController.Update();
+        this.Cursor.Update();
         this.Handles.Update();
         this.TrackEditor.Update();
         this.Train.Update();

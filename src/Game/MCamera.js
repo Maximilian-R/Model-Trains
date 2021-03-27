@@ -1,5 +1,5 @@
 import { MVector } from '../Utilities/MVector.js';
-import { MScrollEvent } from '../Utilities/MEvent.js';
+import { MScrollEvent } from '../Utilities/MInput.js';
 import { SCALE } from './MConstans.js';
 import * as dat from 'dat.gui';
 
