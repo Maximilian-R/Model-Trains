@@ -1,11 +1,10 @@
 import { MVector } from '../Utilities/MVector.js';
 import { MLine, MArc } from '../Utilities/MMath.js';
 import { MDraw } from '../Utilities/MDraw.js';
-import { SCALE } from '../Game/MConstans';
 
-const RAIL_WIDTH = 12 * SCALE;
-const RAIL_STROKE_WIDTH = 2 * SCALE;
-const RAIL_MIDDLE_STROKE_WEIGHT = 6 * SCALE;
+const RAIL_WIDTH = 12;
+const RAIL_STROKE_WIDTH = 2;
+const RAIL_MIDDLE_STROKE_WEIGHT = 6;
 const RAIL_STROKE_COLOR = '#63615f';
 const RAIL_STROKE_COLOR_LIT = '#42f4ee';
 const CENTER_RAIL_STROKE_COLOR = '#7c674e';

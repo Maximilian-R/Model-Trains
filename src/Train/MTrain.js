@@ -1,15 +1,10 @@
 import { KEY_MAP } from '../Game/MControls.js';
 import { MVector } from '../Utilities/MVector.js';
 import { MKeyEvent } from '../Utilities/MEvent.js';
-import { SCALE } from '../Game/MConstans';
-import { MDraw } from '../Utilities/MDraw.js';
-import { MRailCurveEdge } from './MTracks.js';
 import * as dat from 'dat.gui';
 
-//const TRAIN_WAGON_LENGTH = 120 * SCALE;
-//const TRAIN_WAGON_WIDTH = 20 * SCALE;
-const TRAIN_WAGON_WHEEL_INSET = 10 * SCALE;
-const TRAIN_WAGON_GAP = 8 * SCALE;
+const TRAIN_WAGON_WHEEL_INSET = 10;
+const TRAIN_WAGON_GAP = 8;
 
 const TRAIN_FRICTION = 0.02;
 const TRAIN_MAX_SPEED = 10.0;
@@ -77,7 +72,7 @@ export class MTrain {
     Follow() {
         const loco = this.wagons[this.wagons.length - 1];
         if (loco.wheel2.position) {
-            this.GameCamera.Teleport(MVector.Sub(loco.wheel2.position, MVector.Create(sketch.width / 2, sketch.height / 2)));
+            this.GameCamera.Teleport(loco.wheel1.position);
         }
     }
 
@@ -122,11 +117,11 @@ export class MTrainWagon {
     }
 
     get length() {
-        return this.sprite.width * SCALE;
+        return this.sprite.width;
     }
 
     get width() {
-        return this.sprite.height * SCALE;
+        return this.sprite.height;
     }
 
     Update(speed) {
@@ -157,9 +152,9 @@ export class MTrainWagon {
 
         sketch.imageMode(sketch.CENTER);
         sketch.image(this.sprite, 0, 0, this.length, this.width);
-        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2, 0, 5, 16);
         sketch.rotate(sketch.PI);
-        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2, 0, 5, 16);
 
         sketch.pop();
 

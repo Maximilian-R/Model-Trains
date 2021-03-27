@@ -1,3 +1,5 @@
+import { MVector } from './MVector';
+
 export class MHandles {
     constructor(InputHandler) {
         this.freeMoveHandlers = [];

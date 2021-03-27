@@ -326,6 +326,7 @@ class BuildState extends MEditorState {
             this.editor.route.ConnectNodes(this.buildFromNode, this.created.endNode, this.created.rail);
 
             this.nextState = new BuildState(this.editor, this.created.endNode);
+            this.editor.GameCamera.Teleport(this.created.endNode.position);
         }
 
         if (event.event == 'MOUSE_MOVE') {
