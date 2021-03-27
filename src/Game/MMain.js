@@ -52,14 +52,10 @@ import { MRoute } from '../Train/MRoute.js';
 import { MRouteEditor } from '../Train/MRouteEditor.js';
 import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
-import * as dat from 'dat.gui';
+import { MDebug } from './MDebug.js';
 
 export class MMain {
-    constructor() {
-        window.DEBUG_MODE = true;
-        const gui = new dat.GUI({ name: 'My GUI' });
-        gui.add(window, 'DEBUG_MODE');
-    }
+    constructor() {}
 
     Scene1() {
         const route = new MRoute();
@@ -68,6 +64,7 @@ export class MMain {
     }
 
     Setup() {
+        this.Debug = new MDebug();
         this.InputHandler = new MInput();
         this.Handles = new MHandles(this.InputHandler);
         window.Handles = this.Handles;

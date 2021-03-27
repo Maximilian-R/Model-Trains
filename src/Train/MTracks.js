@@ -85,7 +85,7 @@ export class MRailLineEdge extends MRailEdge {
         sketch.stroke(CENTER_RAIL_STROKE_COLOR);
         MDraw.Line(from, to);
 
-        if (DEBUG_MODE) {
+        if (DEBUG_SETTINGS.rail.arc) {
             sketch.stroke(252, 179, 83);
             sketch.strokeWeight(2);
             if (this.node1 && this.node2) {
@@ -197,12 +197,13 @@ export class MRailCurveEdge extends MRailEdge {
             MDraw.Arc(this.origin, this.radius * 2, this.a2, this.a1);
         }
 
-        if (DEBUG_MODE) {
-            sketch.stroke(252, 179, 83);
-            sketch.strokeWeight(2);
+        if (DEBUG_SETTINGS.rail.arc) {
             if (this.node1 && this.node2) {
+                sketch.stroke(252, 179, 83);
+                sketch.strokeWeight(2);
                 MDraw.Line(this.node1.position, this.origin);
                 MDraw.Line(this.origin, this.node2.position);
+
                 sketch.strokeWeight(10);
                 MDraw.Point(this.origin);
             }

@@ -107,7 +107,8 @@ export class MRouteEditor {
 }
 
 export class MEditorState {
-    constructor(editor) {
+    constructor(name, editor) {
+        DEBUG_SETTINGS.on && console.log(name);
         this.editor = editor;
         this.nextState;
     }
@@ -124,8 +125,7 @@ export class MEditorState {
 
 class EditState extends MEditorState {
     constructor(editor) {
-        window.DEBUG_MODE && console.log('Enter Edit State');
-        super(editor);
+        super('Enter Edit State', editor);
 
         this.hoverRail;
         this.hoverNode;
@@ -180,8 +180,7 @@ class EditState extends MEditorState {
 
 class ModifyState extends MEditorState {
     constructor(editor, rail) {
-        window.DEBUG_MODE && console.log('Enter Modify State');
-        super(editor);
+        super('Enter Modify State', editor);
 
         this.rail = rail;
     }
@@ -204,8 +203,7 @@ class ModifyState extends MEditorState {
 
 class AddState extends MEditorState {
     constructor(editor) {
-        window.DEBUG_MODE && console.log('Enter Add State');
-        super(editor);
+        super('Enter Add State', editor);
 
         this.hoverNodeEnd;
         this.hoverRail;
@@ -272,8 +270,7 @@ class AddState extends MEditorState {
 
 class BuildState extends MEditorState {
     constructor(editor, buildFromNode) {
-        window.DEBUG_MODE && console.log('Enter Build State');
-        super(editor);
+        super('Enter Build State', editor);
 
         this.buildFromNode = buildFromNode;
 
@@ -388,8 +385,7 @@ class BuildState extends MEditorState {
 
 class ConnectState extends MEditorState {
     constructor(editor, buildFrom, buildTo) {
-        window.DEBUG_MODE && console.log('Enter Connect State');
-        super(editor);
+        super('Enter Connect State', editor);
 
         this.buildFromNode = buildFrom;
         this.buildToNode = buildTo;
@@ -482,8 +478,7 @@ class ConnectState extends MEditorState {
 
 class RotateNodeState extends MEditorState {
     constructor(editor, node) {
-        window.DEBUG_MODE && console.log('Enter Rotate Node State');
-        super(editor);
+        super('Enter Rotate Node State', editor);
 
         this.node = node;
     }

@@ -91,11 +91,14 @@ export class MNode {
 
     Draw() {
         sketch.push();
-        sketch.strokeWeight(10);
-        sketch.stroke(150, 150, 150);
-        MDraw.Point(this.position);
 
-        if (DEBUG_MODE) {
+        if (DEBUG_SETTINGS.node.position) {
+            sketch.strokeWeight(10);
+            sketch.stroke(150, 150, 150);
+            MDraw.Point(this.position);
+        }
+
+        if (DEBUG_SETTINGS.node.direction) {
             // Tangent line
             const p1 = MVector.Add(this.position, MVector.Mult(this.direction, 40));
             const p2 = MVector.Add(this.position, MVector.Mult(this.direction, -40));

@@ -161,7 +161,7 @@ export class MTrainWagon {
         this.wheel1.Draw();
         this.wheel2.Draw();
 
-        if (DEBUG_MODE) {
+        if (DEBUG_SETTINGS.train.wheelDistance) {
             if (this.wheel1.position && this.wheel2.position) {
                 //sketch.stroke(50, 50, 255);
                 //sketch.strokeWeight(2);
@@ -221,7 +221,7 @@ export class MTrainWheelPair {
     }
 
     Draw() {
-        if (DEBUG_MODE) {
+        if (DEBUG_SETTINGS.train.wheels) {
             sketch.push();
             this.front ? sketch.fill(150, 255, 150) : sketch.fill(255, 150, 150);
             sketch.ellipse(this.position.x, this.position.y, 10);
