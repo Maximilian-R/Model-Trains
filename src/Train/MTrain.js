@@ -54,9 +54,14 @@ export class MTrain {
     Reset() {
         this.wagons = [];
         let offset = 100;
-        const wagons = 6;
+        const locomotives = sketch.MSprites.locos.length;
+        const wagons = sketch.MSprites.carts.length;
         for (var i = 0; i < wagons; i++) {
-            this.wagons.push(new MTrainWagon(this, offset, i === wagons - 1 ? sketch.MSprites.locos[0] : sketch.MSprites.carts[i]));
+            this.wagons.push(new MTrainWagon(this, offset, sketch.MSprites.carts[i]));
+            offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
+        }
+        for (var i = 0; i < locomotives; i++) {
+            this.wagons.push(new MTrainWagon(this, offset, sketch.MSprites.locos[i]));
             offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
         }
     }
@@ -197,15 +202,14 @@ export class MTrainWheelPair {
     }
 
     Update(speed) {
-        // do this calc again when setting next rail=
-        const dstToNextTrack = this.onRail.Distance();
-
+        let dstToNextTrack = this.onRail.Distance();
         this.current += speed;
         while (this.current >= dstToNextTrack) {
             this.current -= dstToNextTrack;
 
             const lastRail = this.onRail;
             this.onRail = this.to.OppositeRail(lastRail);
+            dstToNextTrack = this.onRail.Distance();
             if (this.onRail != null) {
                 this.from = this.to;
                 this.to = this.onRail.OppositeNode(this.from);

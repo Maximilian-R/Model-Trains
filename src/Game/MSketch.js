@@ -46,8 +46,6 @@ const sketch = (p) => {
         );
 
         ['Conectror_5.png'].forEach((filename) => p.MSprites.connectors.push(p.loadImage('Trains/Small/Conectors&Extras/' + filename)));
-
-        console.log(p.MSprites);
     };
 
     p.draw = () => {
