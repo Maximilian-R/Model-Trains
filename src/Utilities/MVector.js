@@ -53,6 +53,10 @@ export class MVector {
         return sketch.dist(p1.x, p1.y, p2.x, p2.y);
     }
 
+    static Lerp(p1, p2, t) {
+        return p5.Vector.lerp(p, v, t);
+    }
+
     static ConstrainToLine(position, direction, target) {
         const distance = target.dist(position);
         return MVector.Add(position, MVector.Mult(direction, distance));
