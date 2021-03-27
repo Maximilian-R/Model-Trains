@@ -5,7 +5,6 @@ import * as dat from 'dat.gui';
 
 const TRAIN_WAGON_WHEEL_INSET = 10;
 const TRAIN_WAGON_GAP = 8;
-
 const TRAIN_FRICTION = 0.02;
 const TRAIN_MAX_SPEED = 10.0;
 const TRAIN_ACCELERATION_FACTOR = 0.04;
@@ -26,6 +25,10 @@ class MTrainGUI {
         this.power = gui.add(this.train, 'power', 0, 1.0, 0.1);
         this.follow = gui.add(this.train, 'follow');
         this.speed = gui.add(this, 'speedValue', 0, TRAIN_MAX_SPEED, 0.1);
+
+        const trainset = gui.addFolder('Trainset');
+        trainset.add(this.train.trainset, 'locomotives', 0, sketch.MSprites.locos.length, 1).onFinishChange(() => this.train.Reset());
+        trainset.add(this.train.trainset, 'wagons', 0, sketch.MSprites.carts.length, 1).onFinishChange(() => this.train.Reset());
     }
 }
 
@@ -39,6 +42,11 @@ export class MTrain {
         this.power = 0.0;
         this.follow = false;
 
+        this.trainset = {
+            locomotives: sketch.MSprites.locos.length,
+            wagons: sketch.MSprites.carts.length,
+        };
+
         this.GameCamera = GameCamera;
         InputHandler.RegisterObserver(this, this.OnEventNotify);
 
@@ -49,13 +57,11 @@ export class MTrain {
     Reset() {
         this.wagons = [];
         let offset = 100;
-        const locomotives = sketch.MSprites.locos.length;
-        const wagons = sketch.MSprites.carts.length;
-        for (var i = 0; i < wagons; i++) {
+        for (var i = 0; i < this.trainset.wagons; i++) {
             this.wagons.push(new MTrainWagon(this, offset, sketch.MSprites.carts[i]));
             offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
         }
-        for (var i = 0; i < locomotives; i++) {
+        for (var i = 0; i < this.trainset.locomotives; i++) {
             this.wagons.push(new MTrainWagon(this, offset, sketch.MSprites.locos[i]));
             offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
         }
