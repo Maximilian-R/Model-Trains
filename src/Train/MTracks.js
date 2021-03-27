@@ -141,7 +141,7 @@ export class MRailCurveEdge extends MRailEdge {
         //Unused
         this.midpoint = MVector.Add(this.node1.position, MVector.Mult(this.v, 0.5));
 
-        this.curvature = (2 * this.v.copy().dot(this.n1)) / this.v.magSq();
+        this.curvature = (2 * MVector.Dot(this.v, this.n1)) / this.v.magSq();
         this.radius = 1 / this.curvature;
         this.origin = MVector.Add(this.node1.position, MVector.Mult(this.n1, this.radius));
         //sign_t means that the angular span exceeds 180 deg.
@@ -155,7 +155,7 @@ export class MRailCurveEdge extends MRailEdge {
         this.a2 = MArc.ToAngle(this.node2.position, this.origin);
     }
 
-    // TODO: Replace somewhere. Direction of the toposition like if the curve would continue
+    // TODO: Replace somewhere. Direction of the toPosition like if the curve would continue
     static CurveDirection(from, toPosition) {
         const t1 = from.direction.copy();
         const v = MVector.Sub(toPosition, from.position);
@@ -201,7 +201,10 @@ export class MRailCurveEdge extends MRailEdge {
             sketch.stroke(252, 179, 83);
             sketch.strokeWeight(2);
             if (this.node1 && this.node2) {
-                MDraw.Line(this.node1.position, this.node2.position);
+                MDraw.Line(this.node1.position, this.origin);
+                MDraw.Line(this.origin, this.node2.position);
+                sketch.strokeWeight(10);
+                MDraw.Point(this.origin);
             }
         }
     }

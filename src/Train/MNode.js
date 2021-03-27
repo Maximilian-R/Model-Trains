@@ -136,10 +136,8 @@ export class MSwitchNode extends MNode {
         if (this.rail1 === undefined && this.rail2.length == 0) {
             return this._direction;
         }
-        if (this.rail1 && this.rail2.length > 0) {
-            return this._direction;
-        }
-        return this.GetAnyRail().node2 === this ? MVector.Invert(this._direction) : this._direction;
+        if (this.rail1 === undefined) return MVector.Invert(this._direction);
+        return this._direction;
     }
 
     HasEmptyRail() {

@@ -86,11 +86,11 @@ export class MMain {
         this.Cursor.Update();
         this.Handles.Update();
         this.TrackEditor.Update();
-        this.Train.Update();
+        this.Train && this.Train.Update();
 
         this.GameCamera.Draw();
         this.TrackEditor.Draw();
-        this.Train.Draw();
+        this.Train && this.Train.Draw();
         this.Handles.Draw();
     }
 }
