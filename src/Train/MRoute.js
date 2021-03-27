@@ -1,5 +1,6 @@
 import { MNode, MSwitchNode } from './MNode.js';
 import { MRailLineEdge, MRailCurveEdge } from './MTracks.js';
+import { MVector } from '../Utilities/MVector.js';
 
 export class MRoute {
     constructor() {
@@ -142,5 +143,21 @@ export class MRoute {
 
     UpdateRailEnds() {
         this.railEnds = this.nodes.filter((node) => node.rail1 == null || node.rail2 == null);
+    }
+
+    Export() {
+        const save = {
+            nodes: this.nodes.map((node) => node.Export()),
+            rails: this.rails.map((rail) => ({ node1: this.nodes.indexOf(rail.node1), node2: this.nodes.indexOf(rail.node2) })),
+        };
+        return JSON.stringify(save);
+    }
+
+    Import(json) {
+        const save = JSON.parse(json);
+        save.nodes.forEach((node) =>
+            this.CreateNode(MVector.Create(node.position.x, node.position.y), MVector.Create(node.direction.x, node.direction.y)),
+        );
+        save.rails.forEach((rail) => this.ConnectNodes(this.nodes[rail.node1], this.nodes[rail.node2]));
     }
 }

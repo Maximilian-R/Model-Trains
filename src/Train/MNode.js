@@ -108,6 +108,12 @@ export class MNode {
         }
         sketch.pop();
     }
+
+    Export() {
+        const position = { x: this.position.x, y: this.position.y };
+        const direction = { x: this.direction.x, y: this.direction.y };
+        return { position: position, direction: direction };
+    }
 }
 
 export class MSwitchNode extends MNode {

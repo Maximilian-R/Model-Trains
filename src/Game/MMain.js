@@ -49,45 +49,21 @@ import { MInput } from '../Utilities/MInput.js';
 import { MCursor } from '../Utilities/MCursor.js';
 import { MHandles } from '../Utilities/MHandles.js';
 import { MRoute } from '../Train/MRoute.js';
-import { MVector } from '../Utilities/MVector.js';
 import { MRouteEditor } from '../Train/MRouteEditor.js';
 import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
 import * as dat from 'dat.gui';
 
-window.DEBUG_MODE = true;
-const gui = new dat.GUI({ name: 'My GUI' });
-gui.add(window, 'DEBUG_MODE');
-
-// function setup() {
-//     createCanvas(window.innerWidth, window.innerHeight);
-//     GameMain = new MMain();
-//     GameMain.Setup();
-// }
-
-// function draw() {
-//     //background("#89909F");
-//     background(220);
-//     GameMain.Tick();
-// }
-
 export class MMain {
-    constructor() {}
+    constructor() {
+        window.DEBUG_MODE = true;
+        const gui = new dat.GUI({ name: 'My GUI' });
+        gui.add(window, 'DEBUG_MODE');
+    }
 
     Scene1() {
         const route = new MRoute();
-        const offsetX = 0;
-        const offsetY = sketch.height / 2;
-        const node1 = route.CreateNode(MVector.Create(offsetX + 0, offsetY + 0), MVector.Create(1, 0));
-        const node2 = route.CreateNode(MVector.Create(offsetX + 1000, offsetY + 0), MVector.Create(1, 0));
-        const node3 = route.CreateNode(MVector.Create(offsetX + 1000, offsetY + 400), MVector.Create(-1, 0));
-        const node4 = route.CreateNode(MVector.Create(offsetX + 0, offsetY + 400), MVector.Create(-1, 0));
-
-        route.ConnectNodes(node1, node2);
-        route.ConnectNodes(node2, node3);
-        route.ConnectNodes(node3, node4);
-        route.ConnectNodes(node4, node1);
-
+        route.Import(SCENE_1);
         return route;
     }
 
@@ -118,3 +94,6 @@ export class MMain {
         this.Handles.Draw();
     }
 }
+
+const SCENE_1 =
+    '{"nodes":[{"position":{"x":0,"y":332},"direction":{"x":1,"y":0}},{"position":{"x":1000,"y":332},"direction":{"x":1,"y":0}},{"position":{"x":1000,"y":732},"direction":{"x":-1,"y":0}},{"position":{"x":0,"y":732},"direction":{"x":-1,"y":0}}],"rails":[{"node1":0,"node2":1},{"node1":1,"node2":2},{"node1":2,"node2":3},{"node1":3,"node2":0}]}';
