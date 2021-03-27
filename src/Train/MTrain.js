@@ -56,7 +56,7 @@ export class MTrain {
         let offset = 100;
         const wagons = 6;
         for (var i = 0; i < wagons; i++) {
-            this.wagons.push(new MTrainWagon(this, offset, i === wagons - 1 ? sketch.MSprites[1] : sketch.MSprites[0]));
+            this.wagons.push(new MTrainWagon(this, offset, i === wagons - 1 ? sketch.MSprites.locos[0] : sketch.MSprites.carts[i]));
             offset += this.wagons[this.wagons.length - 1].length + TRAIN_WAGON_GAP;
         }
     }
@@ -152,9 +152,9 @@ export class MTrainWagon {
 
         sketch.imageMode(sketch.CENTER);
         sketch.image(this.sprite, 0, 0, this.length, this.width);
-        sketch.image(sketch.MSprites[2], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
         sketch.rotate(sketch.PI);
-        sketch.image(sketch.MSprites[2], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
+        sketch.image(sketch.MSprites.connectors[0], this.length / 2 + 2 * SCALE, 0, 5 * SCALE, 16 * SCALE);
 
         sketch.pop();
 
