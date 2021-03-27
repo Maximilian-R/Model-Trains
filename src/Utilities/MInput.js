@@ -23,7 +23,7 @@ export class MInput extends MSubject {
         sketch.keyPressed = () => {
             this.OnKeyPress(sketch.keyCode);
         };
-        sketch.mouseWheel = function (event) {
+        sketch.mouseWheel = (event) => {
             this.OnMouseScroll(this.mouse, MVector.Create(event.deltaX, event.deltaY));
         };
     }
