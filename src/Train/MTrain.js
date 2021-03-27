@@ -204,13 +204,14 @@ export class MTrainWheelPair {
 
             const lastRail = this.onRail;
             this.onRail = this.to.OppositeRail(lastRail);
-            dstToNextTrack = this.onRail.Distance();
             if (this.onRail != null) {
+                dstToNextTrack = this.onRail.Distance();
                 this.from = this.to;
                 this.to = this.onRail.OppositeNode(this.from);
             } else {
                 // TODO: Derail, no more rail!
                 this.onRail = lastRail;
+                console.error('Derail');
                 //break;
             }
         }

@@ -30,6 +30,10 @@ export class MNode {
         return this.GetAnyRail().node1 === this ? MVector.Invert(this._direction) : this._direction;
     }
 
+    HasEmptyRail() {
+        return this.rail1 === undefined || this.rail2 === undefined;
+    }
+
     OppositeRail(rail) {
         if (rail === this.rail1) {
             return this.rail2;
@@ -138,6 +142,10 @@ export class MSwitchNode extends MNode {
         return this.GetAnyRail().node2 === this ? MVector.Invert(this._direction) : this._direction;
     }
 
+    HasEmptyRail() {
+        return this.rail1 === undefined || this.rail2.length <= 1;
+    }
+
     OppositeRail(rail) {
         if (rail === this.rail1) {
             return this.rail2[this.switch];
@@ -213,8 +221,8 @@ export class MSwitchNode extends MNode {
     }
 
     Draw() {
-        sketch.push();
         super.Draw();
+        sketch.push();
         sketch.translate(this.position.x, this.position.y);
         sketch.noStroke();
         this.rail2.forEach((_, i) => {

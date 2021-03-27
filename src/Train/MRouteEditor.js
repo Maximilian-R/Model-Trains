@@ -248,11 +248,14 @@ class AddState extends MEditorState {
 
         if (event.event === 'CURSOR_MOVED') {
             this.hoverNodeEnd = undefined;
-            this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
-            if (this.hoverRail) {
-                this.editor.points[0] = this.hoverRail.ClosestPositionOnTrack(this.editor.points[0], this.hoverRail);
-            } else {
-                this.hoverNodeEnd = this.editor.route.GetNodeEndAt(this.editor.points[0]);
+            this.hoverRail = undefined;
+
+            this.hoverNodeEnd = this.editor.route.GetNodeEndAt(this.editor.points[0]);
+            if (!this.hoverNodeEnd) {
+                this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
+                if (this.hoverRail) {
+                    this.editor.points[0] = this.hoverRail.ClosestPositionOnTrack(this.editor.points[0], this.hoverRail);
+                }
             }
         }
 

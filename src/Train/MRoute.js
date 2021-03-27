@@ -142,7 +142,7 @@ export class MRoute {
     }
 
     UpdateRailEnds() {
-        this.railEnds = this.nodes.filter((node) => node.rail1 == null || node.rail2 == null);
+        this.railEnds = this.nodes.filter((node) => node.HasEmptyRail());
     }
 
     Export() {
