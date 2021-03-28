@@ -164,9 +164,7 @@ export class MRoute {
             ),
         );
         save.rails.forEach((rail) => {
-            this.CreateRail(this.nodes[rail.node1], this.nodes[rail.node2]);
-            this.nodes[rail.node1].SetRail1();
-            this.nodes[rail.node2].SetRail2();
+            this.ConnectNodes(this.nodes[rail.node1], this.nodes[rail.node2]);
         });
     }
 }
