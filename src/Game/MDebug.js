@@ -5,14 +5,15 @@ export class MDebug {
         this.on = true;
         this.settings = {
             node: {
-                position: true,
+                position: false,
                 direction: true,
+                switchSplit: false,
             },
             rail: {
-                arc: true,
+                arc: false,
             },
             train: {
-                wheelDistance: true,
+                wheelDistance: false,
                 wheels: true,
             },
         };
@@ -25,7 +26,7 @@ export class MDebug {
             .onFinishChange((value) => {
                 this.controllers.forEach((controller) => controller.setValue(value));
             })
-            .name('ON');
+            .name('Toggle All');
         this.Folder(this.settings, this.gui);
     }
 
