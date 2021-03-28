@@ -8,7 +8,7 @@ export class MRoute {
         this.rails = [];
 
         // Cached nodes that have a missing connection
-        this.railEnds = [];
+        this.emptyNodeJoints = [];
     }
 
     Draw() {
@@ -25,12 +25,12 @@ export class MRoute {
 
     AddNode(node) {
         this.nodes.push(node);
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
     }
 
     DeleteNode(node) {
         this.nodes.splice(this.nodes.indexOf(node), 1);
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
     }
 
     CreateSwitch(rail, position) {
@@ -44,41 +44,41 @@ export class MRoute {
         this.DeleteRail(rail);
 
         // Create split
-        const rail1 = this.CreateRail(rail.node1, nodeSwitch);
-        const rail2 = this.CreateRail(nodeSwitch, rail.node2);
+        const rail1 = this.CreateRail(rail.joint1, nodeSwitch.in);
+        const rail2 = this.CreateRail(nodeSwitch.out, rail.joint2);
 
         // Connect with switch
-        nodeSwitch.rail1 = rail1;
-        nodeSwitch.rail2.push(rail2);
+        nodeSwitch.in.Connect(rail1);
+        nodeSwitch.out.Connect(rail2);
 
         // Connect with outer rails
-        rail.node1.SetEmptyRail(rail1);
-        rail.node2.SetEmptyRail(rail2);
+        rail.joint1.Connect(rail1);
+        rail.joint2.Connect(rail2);
 
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
 
         return nodeSwitch;
     }
 
     // Refactor?
-    ConnectNodes(fromNode, toNode, rail) {
+    ConnectNodes(fromJoint, toJoint, rail) {
         if (!rail) {
-            rail = this.CreateRail(fromNode, toNode);
+            rail = this.CreateRail(fromJoint, toJoint);
         }
 
-        toNode.SetEmptyRail(rail);
-        fromNode.SetEmptyRail(rail);
+        toJoint.Connect(rail);
+        fromJoint.Connect(rail);
 
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
         return rail;
     }
 
-    CreateRail(fromNode, toNode) {
+    CreateRail(fromJoint, toJoint) {
         let rail;
-        if (MRailLineEdge.IsStraight(fromNode, toNode.position)) {
-            rail = new MRailLineEdge(fromNode, toNode);
+        if (MRailLineEdge.IsStraight(fromJoint, toJoint.position)) {
+            rail = new MRailLineEdge(fromJoint, toJoint);
         } else {
-            rail = new MRailCurveEdge(fromNode, toNode);
+            rail = new MRailCurveEdge(fromJoint, toJoint);
         }
         this.AddRail(rail);
         return rail;
@@ -86,18 +86,18 @@ export class MRoute {
 
     // Refactor?
     // Used in editing when building from a certain existing node.
-    PlanRail(fromNode, toPosition, forceLine) {
+    PlanRail(fromNodeJoint, toPosition, forceLine) {
         let endNode;
         let rail;
         let canBuild = false;
 
-        if (MRailLineEdge.IsStraight(fromNode, toPosition) || forceLine) {
-            endNode = this.CreateNode(toPosition, fromNode.direction, false);
-            rail = new MRailLineEdge(fromNode, endNode);
+        if (MRailLineEdge.IsStraight(fromNodeJoint, toPosition) || forceLine) {
+            endNode = this.CreateNode(toPosition, fromNodeJoint.direction, false);
+            rail = new MRailLineEdge(fromNodeJoint, endNode.in);
         } else {
-            const direction = MRailCurveEdge.CurveDirection(fromNode, toPosition);
+            const direction = MRailCurveEdge.CurveDirection(fromNodeJoint, toPosition);
             endNode = this.CreateNode(toPosition, direction, false);
-            rail = new MRailCurveEdge(fromNode, endNode);
+            rail = new MRailCurveEdge(fromNodeJoint, endNode.in);
         }
 
         const existingRail = this.GetTrackAt(toPosition);
@@ -112,22 +112,22 @@ export class MRoute {
 
     AddRail(rail) {
         this.rails.push(rail);
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
     }
 
     DeleteRail(rail, deleteEmptyNodes = false) {
         this.rails.splice(this.rails.indexOf(rail), 1);
-        rail.node1.RemoveRail(rail);
-        rail.node2.RemoveRail(rail);
+        rail.joint1.Remove(rail);
+        rail.joint2.Remove(rail);
         if (deleteEmptyNodes) {
-            if (rail.node1.GetAnyRail() === undefined) {
-                this.DeleteNode(rail.node1);
+            if (rail.joint1.node.isEmpty) {
+                this.DeleteNode(rail.joint1.node);
             }
-            if (rail.node2.GetAnyRail() === undefined) {
-                this.DeleteNode(rail.node2);
+            if (rail.joint2.node.isEmpty) {
+                this.DeleteNode(rail.joint2.node);
             }
         }
-        this.UpdateRailEnds();
+        this.UpdateNodeJoints();
     }
 
     GetTrackAt(position) {
@@ -138,18 +138,32 @@ export class MRoute {
         return this.nodes.find((node) => node.Collision(position));
     }
 
-    GetNodeEndAt(position) {
-        return this.railEnds.find((node) => node.Collision(position));
+    GetEmptyNodeJointAt(position) {
+        return this.emptyNodeJoints.find((joint) => joint.Collision(position));
     }
 
-    UpdateRailEnds() {
-        this.railEnds = this.nodes.filter((node) => node.HasEmptyRail());
+    UpdateNodeJoints() {
+        this.emptyNodeJoints = this.nodes
+            .map((node) => [node.in, node.out])
+            .flat()
+            .filter((joint) => joint.isEmpty);
     }
 
     Export() {
         const save = {
             nodes: this.nodes.map((node) => node.Export()),
-            rails: this.rails.map((rail) => ({ node1: this.nodes.indexOf(rail.node1), node2: this.nodes.indexOf(rail.node2) })),
+            rails: this.rails.map((rail) => {
+                return {
+                    from: {
+                        node: this.nodes.indexOf(rail.joint1.node),
+                        joint: rail.joint1.id,
+                    },
+                    to: {
+                        node: this.nodes.indexOf(rail.joint2.node),
+                        joint: rail.joint2.id,
+                    },
+                };
+            }),
         };
         return JSON.stringify(save);
     }
@@ -164,7 +178,11 @@ export class MRoute {
             ),
         );
         save.rails.forEach((rail) => {
-            this.ConnectNodes(this.nodes[rail.node1], this.nodes[rail.node2]);
+            const node1 = this.nodes[rail.from.node];
+            const node2 = this.nodes[rail.to.node];
+            const joint1 = node1[rail.from.joint];
+            const joint2 = node2[rail.to.joint];
+            this.ConnectNodes(joint1, joint2);
         });
     }
 }

@@ -44,8 +44,8 @@ export class MTrain {
         this.follow = false;
 
         this.trainset = {
-            locomotives: sketch.MSprites.locos.length,
-            wagons: sketch.MSprites.carts.length,
+            locomotives: 1,
+            wagons: 0,
         };
 
         this.GameCamera = GameCamera;
@@ -192,8 +192,8 @@ export class MTrainWheelPair {
         this.current = current;
         this.position;
         this.onRail = onRail;
-        this.from = this.onRail.node1;
-        this.to = this.onRail.node2;
+        this.from = this.onRail.joint1;
+        this.to = this.onRail.joint2;
         this.front = front;
     }
 
@@ -211,11 +211,11 @@ export class MTrainWheelPair {
             this.current -= dstToNextTrack;
 
             const lastRail = this.onRail;
-            this.onRail = this.to.OppositeRail(lastRail);
+            this.onRail = this.to.node.OppositeRail(lastRail);
             if (this.onRail != null) {
                 dstToNextTrack = this.onRail.Distance();
-                this.from = this.to;
-                this.to = this.onRail.OppositeNode(this.from);
+                this.from = this.to.node.OppositeJoint(this.to);
+                this.to = this.onRail.OppositeJoint(this.from);
             } else {
                 // TODO: Derail, no more rail!
                 this.onRail = lastRail;

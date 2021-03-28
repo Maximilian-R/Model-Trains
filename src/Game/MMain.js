@@ -54,6 +54,7 @@ import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
 import { MDebug } from './MDebug.js';
 import SCENE_2 from './Scenes/SCENE_2.json';
+import { MVector } from '../Utilities/MVector.js';
 
 export class MMain {
     constructor() {}
@@ -76,7 +77,7 @@ export class MMain {
 
         const route = this.LoadScene();
         this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, this.Cursor, route);
-        //this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
+        this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
     }
 
     Tick() {

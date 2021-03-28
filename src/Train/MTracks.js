@@ -10,32 +10,19 @@ const RAIL_STROKE_COLOR_LIT = '#42f4ee';
 const CENTER_RAIL_STROKE_COLOR = '#7c674e';
 
 export class MRailEdge {
-    constructor(node1, node2) {
-        this.node1 = node1;
-        this.node2 = node2;
-
-        //this.t1 = node1.direction.normalize();
-        //TODO: Should t2 use the inverted one?
-        //this.t2 = node2.direction.normalize();
-
+    constructor(joint1, joint2) {
+        this.joint1 = joint1;
+        this.joint2 = joint2;
         this.highlight = false;
     }
 
-    get t1() {
-        return this.node1.direction;
-    }
-
-    get t2() {
-        return this.node2.direction;
-    }
-
-    OppositeNode(node) {
-        if (node === this.node1) {
-            return this.node2;
-        } else if (node === this.node2) {
-            return this.node1;
+    OppositeJoint(joint) {
+        if (joint === this.joint1) {
+            return this.joint2;
+        } else if (joint === this.joint2) {
+            return this.joint1;
         } else {
-            console.error('Node does not have an opposite node');
+            console.error('Joint does not have an opposite joint');
         }
     }
 
@@ -47,8 +34,8 @@ export class MRailEdge {
 }
 
 export class MRailLineEdge extends MRailEdge {
-    constructor(node1, node2) {
-        super(node1, node2);
+    constructor(joint1, joint2) {
+        super(joint1, joint2);
 
         this.splits = [];
         this.CreateSplits();
@@ -62,14 +49,14 @@ export class MRailLineEdge extends MRailEdge {
         const points = Math.floor(this.Distance() / RAIL_WIDTH);
         for (let i = 0; i < points; i++) {
             const t = (i * points) / (points * points);
-            const p = this.PointAlongRail(t, this.node1.position, this.node2.position);
+            const p = this.PointAlongRail(t, this.joint1.position, this.joint2.position);
             this.splits.push(p);
         }
     }
 
     Draw() {
-        const from = this.node1.position;
-        const to = this.node2.position;
+        const from = this.joint1.position;
+        const to = this.joint2.position;
 
         /* TWO RAILS: Simply visual */
         sketch.noFill();
@@ -88,14 +75,14 @@ export class MRailLineEdge extends MRailEdge {
         if (DEBUG_SETTINGS.rail.arc) {
             sketch.stroke(252, 179, 83);
             sketch.strokeWeight(2);
-            if (this.node1 && this.node2) {
-                MDraw.Line(this.node1.position, this.node2.position);
+            if (this.joint1 && this.joint2) {
+                MDraw.Line(this.joint1.position, this.joint2.position);
             }
         }
     }
 
     Distance() {
-        return this.node1.position.dist(this.node2.position);
+        return this.joint1.position.dist(this.joint2.position);
     }
 
     Collision(point) {
@@ -107,13 +94,13 @@ export class MRailLineEdge extends MRailEdge {
     }
 
     TangentAtPoint(position) {
-        return this.t2;
+        return this.joint1.direction;
     }
 
     ClosestPositionOnTrack(position) {
-        const distance = MVector.Dist(this.node1.position, position);
-        const direction = MVector.Sub(this.node2.position, this.node1.position).normalize();
-        return MVector.Add(this.node1.position, MVector.Mult(direction, distance));
+        const distance = MVector.Dist(this.joint1.position, position);
+        const direction = MVector.Sub(this.joint2.position, this.joint1.position).normalize();
+        return MVector.Add(this.joint1.position, MVector.Mult(direction, distance));
     }
 
     // If fromNode.position + from.tangent-line * distance to toNode.position, it's a line.
@@ -130,29 +117,29 @@ export class MRailLineEdge extends MRailEdge {
 }
 
 export class MRailCurveEdge extends MRailEdge {
-    constructor(node1, node2) {
-        super(node1, node2);
+    constructor(joint1, joint2) {
+        super(joint1, joint2);
         this.minRadius = 100;
         this.radiusLimit = 10000;
 
-        this.v = MVector.Sub(this.node2.position, this.node1.position);
-        this.n1 = MVector.RotateLeft(this.t1);
+        this.v = MVector.Sub(this.joint2.position, this.joint1.position);
+        this.n1 = MVector.RotateLeft(this.joint1.direction);
 
         //Unused
-        this.midpoint = MVector.Add(this.node1.position, MVector.Mult(this.v, 0.5));
+        this.midpoint = MVector.Add(this.joint1.position, MVector.Mult(this.v, 0.5));
 
         this.curvature = (2 * MVector.Dot(this.v, this.n1)) / this.v.magSq();
         this.radius = 1 / this.curvature;
-        this.origin = MVector.Add(this.node1.position, MVector.Mult(this.n1, this.radius));
+        this.origin = MVector.Add(this.joint1.position, MVector.Mult(this.n1, this.radius));
         //sign_t means that the angular span exceeds 180 deg.
-        this.sign_t = p5.Vector.dot(this.v, this.t1) < 0;
+        this.sign_t = p5.Vector.dot(this.v, this.joint1.direction) < 0;
         //sign_n means that the angular span goes to the right side of the tangent
         this.sign_n = p5.Vector.dot(this.v, this.n1) < 0;
-        this.n2 = MVector.Sub(this.origin, this.node2.position)
+        this.n2 = MVector.Sub(this.origin, this.joint2.position)
             .normalize()
             .mult(this.sign_n ? 1 : -1);
-        this.a1 = MArc.ToAngle(this.node1.position, this.origin);
-        this.a2 = MArc.ToAngle(this.node2.position, this.origin);
+        this.a1 = MArc.ToAngle(this.joint1.position, this.origin);
+        this.a2 = MArc.ToAngle(this.joint2.position, this.origin);
     }
 
     // TODO: Replace somewhere. Direction of the toPosition like if the curve would continue
@@ -198,11 +185,11 @@ export class MRailCurveEdge extends MRailEdge {
         }
 
         if (DEBUG_SETTINGS.rail.arc) {
-            if (this.node1 && this.node2) {
+            if (this.joint1 && this.joint2) {
                 sketch.stroke(252, 179, 83);
                 sketch.strokeWeight(2);
-                MDraw.Line(this.node1.position, this.origin);
-                MDraw.Line(this.origin, this.node2.position);
+                MDraw.Line(this.joint1.position, this.origin);
+                MDraw.Line(this.origin, this.joint2.position);
 
                 sketch.strokeWeight(10);
                 MDraw.Point(this.origin);
@@ -215,7 +202,7 @@ export class MRailCurveEdge extends MRailEdge {
         let atAngle = totalArcLength * t;
         let startAngle;
 
-        if (MVector.Equals(from, this.node1.position)) {
+        if (MVector.Equals(from, this.joint1.position)) {
             startAngle = this.a1;
         } else {
             startAngle = this.a2;
@@ -251,7 +238,7 @@ export class MRailCurveEdge extends MRailEdge {
 
     ClosestPositionOnTrack(position) {
         const direction = MVector.Sub(position, this.origin).normalize();
-        const distance = MVector.Dist(this.origin, this.node2.position);
+        const distance = MVector.Dist(this.origin, this.joint2.position);
         return MVector.Add(this.origin, MVector.Mult(direction, distance));
     }
 
@@ -283,6 +270,6 @@ export class MRailCurveEdge extends MRailEdge {
     }
 
     Validate() {
-        return this.node2.position.dist(this.origin) >= this.minRadius;
+        return this.joint2.position.dist(this.origin) >= this.minRadius;
     }
 }

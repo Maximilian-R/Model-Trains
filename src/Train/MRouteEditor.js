@@ -55,10 +55,10 @@ BIARCS!
             new SwitchNode(position, tangent)
             add to nodes
             remove rail
-            Create rail1 (rail.node1, switch)
-            Create rail2 (switch, rail.node2)
-            rail.node1 replace (oldrail with rail1)
-            rail.node2 replace (oldrail with rail2)
+            Create rail1 (rail.joint1, switch)
+            Create rail2 (switch, rail.joint2)
+            rail.joint1 replace (oldrail with rail1)
+            rail.joint2 replace (oldrail with rail2)
 
         CreateRail(fromNode, toNode)
             isStraight? new RailLine(from, to) : new RailCurve(from, to)
@@ -108,7 +108,7 @@ export class MRouteEditor {
 
 export class MEditorState {
     constructor(name, editor) {
-        DEBUG_SETTINGS.on && console.log(name);
+        DEBUG_SETTINGS.editor.enter && console.log(name);
         this.editor = editor;
         this.nextState;
     }
@@ -205,26 +205,26 @@ class AddState extends MEditorState {
     constructor(editor) {
         super('Enter Add State', editor);
 
-        this.hoverNodeEnd;
+        this.hoverNodeJoint;
         this.hoverRail;
-        this.railEnds;
+        this.emptyNodeJoints;
     }
 
     OnEnter() {
-        this.railEnds = this.editor.route.railEnds;
+        this.emptyNodeJoints = this.editor.route.emptyNodeJoints;
     }
 
     Draw() {
         sketch.noFill();
         sketch.strokeWeight(3);
-        this.railEnds.forEach((node) => {
-            node === this.hoverNodeEnd ? sketch.stroke(0, 80, 255, 255) : sketch.stroke(0, 200, 255, 200);
-            MDraw.DrawTriangle(node.position, node.direction);
+        this.emptyNodeJoints.forEach((joint) => {
+            joint === this.hoverNodeJoint ? sketch.stroke(0, 80, 255, 255) : sketch.stroke(0, 200, 255, 200);
+            MDraw.DrawTriangle(joint.position, joint.direction);
         });
     }
 
     Update() {
-        if (!this.hoverNodeEnd) {
+        if (!this.hoverNodeJoint) {
             this.editor.points[0] = window.Handles.FreeMoveHandle(0, this.editor.points[0], 15);
         }
 
@@ -233,11 +233,11 @@ class AddState extends MEditorState {
 
     OnUserInput(event) {
         if (event.event === 'MOUSE_DOWN' && event.button === 'left') {
-            if (this.hoverNodeEnd) {
-                this.nextState = new BuildState(this.editor, this.hoverNodeEnd);
+            if (this.hoverNodeJoint) {
+                this.nextState = new BuildState(this.editor, this.hoverNodeJoint);
             } else if (this.hoverRail) {
                 const switchNode = this.editor.route.CreateSwitch(this.hoverRail, this.editor.points[0]);
-                this.nextState = new BuildState(this.editor, switchNode);
+                this.nextState = new BuildState(this.editor, switchNode.out);
             } else {
                 const fromNode = this.editor.route.CreateNode(this.editor.points[0], MVector.Create(1, 0));
                 this.nextState = new RotateNodeState(this.editor, fromNode);
@@ -245,11 +245,11 @@ class AddState extends MEditorState {
         }
 
         if (event.event === 'CURSOR_MOVED') {
-            this.hoverNodeEnd = undefined;
+            this.hoverNodeJoint = undefined;
             this.hoverRail = undefined;
 
-            this.hoverNodeEnd = this.editor.route.GetNodeEndAt(this.editor.points[0]);
-            if (!this.hoverNodeEnd) {
+            this.hoverNodeJoint = this.editor.route.GetEmptyNodeJointAt(this.editor.points[0]);
+            if (!this.hoverNodeJoint) {
                 this.hoverRail = this.editor.route.GetTrackAt(this.editor.points[0]);
                 if (this.hoverRail) {
                     this.editor.points[0] = this.hoverRail.ClosestPositionOnTrack(this.editor.points[0], this.hoverRail);
@@ -269,20 +269,23 @@ class AddState extends MEditorState {
 }
 
 class BuildState extends MEditorState {
-    constructor(editor, buildFromNode) {
+    constructor(editor, fromNodeJoint) {
         super('Enter Build State', editor);
 
-        this.buildFromNode = buildFromNode;
+        this.fromNodeJoint = fromNodeJoint;
+        this.buildFromNode = fromNodeJoint.node;
 
         this.invert = false;
-        this.availableNodeEnds = [];
+        this.availableNodeJoints = [];
         this.forceStraight = false;
     }
 
     OnEnter() {
         const rail = this.buildFromNode.GetAnyRail();
-        const oppsite = rail instanceof MRailLineEdge && rail.OppositeNode(this.buildFromNode);
-        this.availableNodeEnds = this.editor.route.railEnds.filter((node) => node !== oppsite && node !== this.buildFromNode);
+        const oppsite = undefined; //rail instanceof MRailLineEdge && rail.OppositeJoint(this.buildFromNode);
+        this.availableNodeJoints = this.editor.route.emptyNodeJoints.filter(
+            (joint) => joint.node !== oppsite && joint.node !== this.buildFromNode,
+        );
     }
 
     Draw() {
@@ -291,7 +294,7 @@ class BuildState extends MEditorState {
         sketch.noFill();
         const rail = this.created.rail;
         if (rail instanceof MRailLineEdge) {
-            MDraw.Line(rail.node1.position, rail.node2.position);
+            MDraw.Line(rail.joint1.position, rail.joint2.position);
         } else {
             if (rail.sign_n) {
                 MDraw.Arc(rail.origin, rail.radius * 2, rail.a1, rail.a2);
@@ -303,7 +306,7 @@ class BuildState extends MEditorState {
         sketch.stroke(0, 200, 255, 200);
         sketch.noFill();
         sketch.strokeWeight(2);
-        this.availableNodeEnds.forEach((node) => {
+        this.availableNodeJoints.forEach((node) => {
             MDraw.DrawTriangle(node.position, node.direction);
         });
     }
@@ -311,7 +314,7 @@ class BuildState extends MEditorState {
     Update() {
         this.editor.points[0] = window.Handles.FreeMoveHandle(0, this.editor.points[0], 15);
 
-        this.created = this.editor.route.PlanRail(this.buildFromNode, this.editor.points[0], this.forceStraight);
+        this.created = this.editor.route.PlanRail(this.fromNodeJoint, this.editor.points[0], this.forceStraight);
 
         return super.Update();
     }
@@ -326,9 +329,9 @@ class BuildState extends MEditorState {
             // One function should BUILD (adding it to the route)
             this.editor.route.AddNode(this.created.endNode);
             this.editor.route.AddRail(this.created.rail);
-            this.editor.route.ConnectNodes(this.buildFromNode, this.created.endNode, this.created.rail);
+            this.editor.route.ConnectNodes(this.fromNodeJoint, this.created.endNode.in, this.created.rail);
 
-            this.nextState = new BuildState(this.editor, this.created.endNode);
+            this.nextState = new BuildState(this.editor, this.created.endNode.out);
             this.editor.camera.Teleport(this.created.endNode.position);
         }
 
@@ -339,15 +342,15 @@ class BuildState extends MEditorState {
             if (this.forceStraight) {
                 this.editor.points[0] = MVector.ConstrainToLine(
                     this.buildFromNode.position,
-                    this.buildFromNode.direction,
+                    this.fromNodeJoint.direction,
                     this.editor.points[0],
                 );
             }
 
-            this.availableNodeEnds.some((node) => {
-                if (this.editor.points[0].dist(node.position) < 20) {
-                    this.editor.points[2] = MLine.MidPoint(this.buildFromNode.position, node.position);
-                    this.nextState = new ConnectState(this.editor, this.buildFromNode, node);
+            this.availableNodeJoints.some((joint) => {
+                if (this.editor.points[0].dist(joint.position) < 20) {
+                    this.editor.points[2] = MLine.MidPoint(this.fromNodeJoint.position, joint.position);
+                    this.nextState = new ConnectState(this.editor, this.fromNodeJoint, joint);
                     return true;
                 }
                 return false;
@@ -363,7 +366,7 @@ class BuildState extends MEditorState {
             if (this.forceStraight) {
                 this.editor.points[0] = MVector.ConstrainToLine(
                     this.buildFromNode.position,
-                    this.buildFromNode.direction,
+                    this.fromNodeJoint.direction,
                     this.editor.points[0],
                 );
             }
@@ -384,11 +387,13 @@ class BuildState extends MEditorState {
 }
 
 class ConnectState extends MEditorState {
-    constructor(editor, buildFrom, buildTo) {
+    constructor(editor, fromJoint, toJoint) {
         super('Enter Connect State', editor);
 
-        this.buildFromNode = buildFrom;
-        this.buildToNode = buildTo;
+        this.fromJoint = fromJoint;
+        this.toJoint = toJoint;
+        //this.buildFromNode = buildFrom;
+        //this.buildToNode = buildTo;
         this.minRadius = 100;
         this.radiusLimit = 10000;
         this.biarcCircle;
@@ -411,16 +416,16 @@ class ConnectState extends MEditorState {
         this.editor.points[2] = window.Handles.FreeMoveHandle(0, this.editor.points[2], 15);
 
         // TODO: Instead of creating a new each update, update values and handle every update in the RailCurve?
-        const direction = MRailCurveEdge.CurveDirection(this.buildFromNode, this.editor.points[2]);
+        const direction = MRailCurveEdge.CurveDirection(this.fromJoint, this.editor.points[2]);
         this.controlNode = this.editor.route.CreateNode(this.editor.points[2], direction, false);
-        this.rail1 = new MRailCurveEdge(this.buildFromNode, this.controlNode);
-        this.rail2 = new MRailCurveEdge(this.buildToNode, this.controlNode);
+        this.rail1 = new MRailCurveEdge(this.fromJoint, this.controlNode.in);
+        this.rail2 = new MRailCurveEdge(this.toJoint, this.controlNode.out);
 
         this.biarcCircle = MArc.BiarcValidControlCircle(
-            this.buildFromNode.position,
-            this.buildFromNode.direction,
-            this.buildToNode.position,
-            this.buildToNode.direction,
+            this.fromJoint.position,
+            this.fromJoint.direction,
+            this.toJoint.position,
+            this.toJoint.direction,
         );
 
         if (this.controlNode.position.dist(this.rail1.origin) >= this.minRadius) {
@@ -461,8 +466,8 @@ class ConnectState extends MEditorState {
     OnUserInput(event) {
         if (event.event == 'MOUSE_DOWN' && event.button == 'left' && this.canBuild1 && this.canBuild2) {
             this.editor.route.AddNode(this.controlNode);
-            this.editor.route.ConnectNodes(this.buildFromNode, this.controlNode);
-            this.editor.route.ConnectNodes(this.controlNode, this.buildToNode);
+            this.editor.route.ConnectNodes(this.fromJoint, this.controlNode.in);
+            this.editor.route.ConnectNodes(this.controlNode.out, this.toJoint);
             this.nextState = new AddState(this.editor);
         }
 
@@ -471,7 +476,7 @@ class ConnectState extends MEditorState {
         }
 
         if (event.event == 'KEY_PRESS' && event.key == KEY_MAP.ESC) {
-            this.nextState = new BuildState(this.editor, this.buildFromNode);
+            this.nextState = new BuildState(this.editor, this.fromJoint);
         }
     }
 }
@@ -497,7 +502,7 @@ class RotateNodeState extends MEditorState {
 
     OnUserInput(event) {
         if (event.event == 'MOUSE_DOWN' && event.button == 'left') {
-            this.nextState = new BuildState(this.editor, this.node);
+            this.nextState = new BuildState(this.editor, this.node.out);
         }
 
         if (event.event == 'CURSOR_MOVED') {

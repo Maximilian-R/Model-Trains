@@ -7,7 +7,7 @@ export class MDebug {
             node: {
                 position: false,
                 direction: true,
-                switchSplit: false,
+                switchSplit: true,
             },
             rail: {
                 arc: false,
@@ -15,6 +15,9 @@ export class MDebug {
             train: {
                 wheelDistance: false,
                 wheels: true,
+            },
+            editor: {
+                enter: true,
             },
         };
 
