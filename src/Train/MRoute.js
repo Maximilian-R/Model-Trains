@@ -16,8 +16,9 @@ export class MRoute {
         this.nodes.forEach((node) => node.Draw());
     }
 
-    CreateNode(position, direction, add = true) {
-        const node = new MNode(position, direction);
+    CreateNode(position, direction, add = true, type = 0) {
+        const nodeClass = type === 0 ? MNode : MSwitchNode;
+        const node = new nodeClass(position, direction);
         if (add) this.AddNode(node);
         return node;
     }
@@ -155,8 +156,17 @@ export class MRoute {
 
     Import(save) {
         save.nodes.forEach((node) =>
-            this.CreateNode(MVector.Create(node.position.x, node.position.y), MVector.Create(node.direction.x, node.direction.y)),
+            this.CreateNode(
+                MVector.Create(node.position.x, node.position.y),
+                MVector.Create(node.direction.x, node.direction.y),
+                true,
+                node.type,
+            ),
         );
-        save.rails.forEach((rail) => this.ConnectNodes(this.nodes[rail.node1], this.nodes[rail.node2]));
+        save.rails.forEach((rail) => {
+            this.CreateRail(this.nodes[rail.node1], this.nodes[rail.node2]);
+            this.nodes[rail.node1].SetRail1();
+            this.nodes[rail.node2].SetRail2();
+        });
     }
 }

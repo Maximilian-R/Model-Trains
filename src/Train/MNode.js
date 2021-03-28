@@ -119,7 +119,8 @@ export class MNode {
     Export() {
         const position = { x: this.position.x, y: this.position.y };
         const direction = { x: this.direction.x, y: this.direction.y };
-        return { position: position, direction: direction };
+        const type = this instanceof MNodeSwitch ? 1 : 0;
+        return { position: position, direction: direction, type };
     }
 }
 
@@ -175,7 +176,7 @@ export class MSwitchNode extends MNode {
     SetEmptyRail(rail) {
         if (this.rail1 === undefined) {
             this.rail1 = rail;
-        } else if (this.rail2.length < 2) {
+        } else if (this.rail2.length <= 1) {
             this.rail2.push(rail);
         } else {
             console.error('Node has already two connected rails');
@@ -232,6 +233,19 @@ export class MSwitchNode extends MNode {
         });
         this.highlight ? sketch.fill(0, 200, 200, 200) : sketch.fill(0, 0, 150, 100);
         sketch.ellipse(0, 0, NODE_COLLISION_RADIUS, NODE_COLLISION_RADIUS);
+
+        if (DEBUG_SETTINGS.node.switchSplit) {
+            const funx = (rail, output) => {
+                const t = 100 / rail.Distance();
+                const point = rail.PointAlongRail(t, this.position, rail.OppositeNode(this).position).sub(this.position);
+                sketch.strokeWeight(2);
+                output ? sketch.stroke(175, 50, 255) : sketch.stroke(255, 255, 50);
+                MDraw.Line(MVector.Create(), point);
+            };
+
+            this.rail1 && funx(this.rail1, false);
+            this.rail2.forEach((rail) => funx(rail, true));
+        }
         sketch.pop();
     }
 }
