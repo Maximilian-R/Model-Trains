@@ -13,19 +13,19 @@ const TRAIN_ACCELERATION_FACTOR = 0.08;
 class MTrainGUI {
     constructor(train) {
         this.train = train;
-        this.speedValue = 0;
+        this.speed = 0;
         this.setup();
     }
 
     update() {
-        this.speed.setValue(this.train.speed);
+        this.speedController.setValue(this.train.speed);
     }
 
     setup() {
         const gui = new dat.GUI({ name: 'Train' });
-        this.power = gui.add(this.train, 'power', 0, 1.0, 0.1);
-        this.follow = gui.add(this.train, 'follow');
-        this.speed = gui.add(this, 'speedValue', 0, TRAIN_MAX_SPEED, 0.1);
+        this.powerController = gui.add(this.train, 'power', 0, 1.0, 0.1);
+        this.followController = gui.add(this.train, 'follow');
+        this.speedController = gui.add(this, 'speed', 0, TRAIN_MAX_SPEED, 0.1);
 
         const trainset = gui.addFolder('Trainset');
         trainset.add(this.train.trainset, 'locomotives', 0, sketch.MSprites.locos.length, 1).onFinishChange(() => this.train.Reset());
