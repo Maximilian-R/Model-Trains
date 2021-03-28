@@ -5,9 +5,10 @@ import * as dat from 'dat.gui';
 
 const TRAIN_WAGON_WHEEL_INSET = 10;
 const TRAIN_WAGON_GAP = 8;
-const TRAIN_FRICTION = 0.02;
+const RAIL_FRICTION = 0.02;
+const SPEED_FRICTION = 0.005;
 const TRAIN_MAX_SPEED = 10.0;
-const TRAIN_ACCELERATION_FACTOR = 0.04;
+const TRAIN_ACCELERATION_FACTOR = 0.08;
 
 class MTrainGUI {
     constructor(train) {
@@ -84,8 +85,9 @@ export class MTrain {
 
     Update() {
         this.acc = this.power * TRAIN_ACCELERATION_FACTOR;
-        this.speed -= TRAIN_FRICTION;
+        this.speed -= RAIL_FRICTION;
         this.speed += this.acc;
+        this.speed -= this.speed * SPEED_FRICTION;
         if (this.speed >= TRAIN_MAX_SPEED) {
             this.speed = TRAIN_MAX_SPEED;
         }
