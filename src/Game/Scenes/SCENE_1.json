@@ -1,0 +1,14 @@
+{
+    "nodes": [
+        { "position": { "x": 0, "y": 332 }, "direction": { "x": 1, "y": 0 }, "type": 0 },
+        { "position": { "x": 1000, "y": 332 }, "direction": { "x": 1, "y": 0 }, "type": 0 },
+        { "position": { "x": 1000, "y": 732 }, "direction": { "x": -1, "y": 0 }, "type": 0 },
+        { "position": { "x": 0, "y": 732 }, "direction": { "x": -1, "y": 0 }, "type": 0 }
+    ],
+    "rails": [
+        { "node1": 0, "node2": 1 },
+        { "node1": 1, "node2": 2 },
+        { "node1": 2, "node2": 3 },
+        { "node1": 3, "node2": 0 }
+    ]
+}

@@ -153,8 +153,7 @@ export class MRoute {
         return JSON.stringify(save);
     }
 
-    Import(json) {
-        const save = JSON.parse(json);
+    Import(save) {
         save.nodes.forEach((node) =>
             this.CreateNode(MVector.Create(node.position.x, node.position.y), MVector.Create(node.direction.x, node.direction.y)),
         );

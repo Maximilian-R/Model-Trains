@@ -53,13 +53,14 @@ import { MRouteEditor } from '../Train/MRouteEditor.js';
 import { MTrain } from '../Train/MTrain.js';
 import { MCamera, MCameraController } from './MCamera.js';
 import { MDebug } from './MDebug.js';
+import SCENE_2 from './Scenes/SCENE_2.json';
 
 export class MMain {
     constructor() {}
 
-    Scene1() {
+    LoadScene() {
         const route = new MRoute();
-        route.Import(SCENE_1);
+        route.Import(SCENE_2);
         return route;
     }
 
@@ -73,9 +74,9 @@ export class MMain {
         this.GameCameraController = new MCameraController(this.InputHandler, this.GameCamera);
         this.Cursor = new MCursor(this.GameCamera);
 
-        const route = this.Scene1();
+        const route = this.LoadScene();
         this.TrackEditor = new MRouteEditor(this.GameCamera, this.InputHandler, this.Cursor, route);
-        this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
+        //this.Train = new MTrain(this.InputHandler, this.GameCamera, route.rails);
     }
 
     Tick() {
@@ -91,6 +92,3 @@ export class MMain {
         this.Handles.Draw();
     }
 }
-
-const SCENE_1 =
-    '{"nodes":[{"position":{"x":0,"y":332},"direction":{"x":1,"y":0}},{"position":{"x":1000,"y":332},"direction":{"x":1,"y":0}},{"position":{"x":1000,"y":732},"direction":{"x":-1,"y":0}},{"position":{"x":0,"y":732},"direction":{"x":-1,"y":0}}],"rails":[{"node1":0,"node2":1},{"node1":1,"node2":2},{"node1":2,"node2":3},{"node1":3,"node2":0}]}';
