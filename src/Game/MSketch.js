@@ -1,4 +1,4 @@
-import p5 from '../../libraries/p5.js';
+// import * as p5 from '../../libraries/p5.js';
 import { MMain } from './MMain.js';
 import { MVector } from '../Utilities/MVector.js';
 
@@ -39,13 +39,15 @@ const sketch = (p) => {
             'Cart_Short_Packages.png',
             'Cart_Short_Packages_Container.png',
             'Cart_Short_Packages_Liquid.png',
-        ].forEach((filename) => p.MSprites.carts.push(p.loadImage('Trains/Small/Carts/' + filename)));
+        ].forEach((filename) => p.MSprites.carts.push(p.loadImage('src/Assets/Trains/Small/Carts/' + filename)));
 
         ['Train_120x20_Green.png', 'Train_120x20_White.png', 'Train_130x20_Blue.png', 'Train_130x20_Desert.png'].forEach((filename) =>
-            p.MSprites.locos.push(p.loadImage('Trains/Small/Trains/' + filename)),
+            p.MSprites.locos.push(p.loadImage('src/Assets/Trains/Small/Trains/' + filename)),
         );
 
-        ['Conectror_5.png'].forEach((filename) => p.MSprites.connectors.push(p.loadImage('Trains/Small/Conectors&Extras/' + filename)));
+        ['Conectror_5.png'].forEach((filename) =>
+            p.MSprites.connectors.push(p.loadImage('src/Assets/Trains/Small/Conectors&Extras/' + filename)),
+        );
     };
 
     p.draw = () => {
@@ -54,4 +56,4 @@ const sketch = (p) => {
     };
 };
 
-new p5(sketch);
+new p5(sketch, document.querySelector('#app'));
